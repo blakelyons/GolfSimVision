@@ -62,6 +62,38 @@ analysis and docs are comfortable on either machine.
 
 ---
 
+## Reference material
+
+Not part of this repo. Lives alongside it in the workspace root — on the dev PC that is
+`D:\SharedProjects\WebcamPutting\`, reachable from the MacBook as
+`192.168.5.142 → /Volumes/SharedProjects/WebcamPutting`.
+
+```
+<workspace root>/
+├── GolfSimVision/                      this repo
+├── SimLinkPutting/                     V1 — see note below
+├── example-apps/
+│   ├── cam-putting-py/                 closest prior art; the benchmark baseline
+│   ├── openflight-2f8920bc…/           OpenConnect codec + JSON framing reference
+│   └── gspro-connector/                second independent OpenConnect implementation
+└── Claude outputs/                     V1-era handoff notes
+```
+
+**V1 is `SimLinkPutting`** on the PC. It was called `SimPuttLink` on the MacBook — same
+project, and older notes use both names. Read-only. Useful parts:
+
+| Path | Why |
+|---|---|
+| `backend/monitors/r10.py` | Working E6 Connect handshake — ADR-0002 ports this |
+| `backend/simulators/gspro.py` | Two-phase connection and reconnect logic worth keeping |
+| `frontend/app/globals.css` | The design tokens to preserve |
+| `CONTEXT.md`, `TESTING.md`, `docs/adr/` | What went wrong, in detail |
+
+**V1's architecture is explicitly not the model for this project** — see ADR-0006 and
+§7 of the Readiness Review. Its visual design is preserved; its engineering is not.
+
+---
+
 ## Repository layout
 
 ```

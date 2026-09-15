@@ -3,16 +3,19 @@
 **Date:** 2026-09-15
 **Status:** Pre-implementation. No code written. This document exists to be argued with.
 
-Sources read for this review:
+Sources read for this review. Paths are relative to the workspace root that holds both
+this repo and the reference material — `D:\SharedProjects\WebcamPutting\` on the dev PC.
+*(The V1 project folder is named `SimLinkPutting` there; earlier notes may call it
+`SimPuttLink`, which was its name on the MacBook. Same project.)*
 
 | Source | Location |
 |---|---|
-| Kickoff, Prototype Appendix, Co-Work Prompt | project docs |
-| **SimPuttLink (V1)** — full codebase, docs, ADRs, session logs | `Web Cam Putting/SimPuttLink` |
+| Kickoff, Prototype Appendix, Co-Work Prompt | `GolfSimVision/docs/` |
+| **V1 (SimLinkPutting)** — full codebase, docs, ADRs, session logs | `SimLinkPutting/` |
 | **OpenFlight** — full source, docs, archived plans | `example-apps/openflight-2f8920bc…` |
 | **cam-putting-py** (alleexx) — closest prior art, with git history | `example-apps/cam-putting-py` |
 | **gspro-connector** (kenjdavidson, Java) — second independent OpenConnect impl | `example-apps/gspro-connector` |
-| **gspro-r10.exe v2.1.1** (.NET) — the R10 connector V1 was built around | `SimPuttLink/launch_monitor_connectors/garmin_r10` |
+| **gspro-r10.exe v2.1.1** (.NET) — the R10 connector V1 was built around | `SimLinkPutting/launch_monitor_connectors/garmin_r10` |
 | **GSPro Open Connect V1 spec** | gsprogolf.com/GSProConnectV1.html (fetched) |
 | Apple AVFoundation / VideoToolbox / Network docs, HaishinKit source, OpenCV source, FFmpeg docs | primary sources |
 
