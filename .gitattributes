@@ -1,0 +1,19 @@
+# Normalize line endings in the repo; check out LF everywhere by default.
+# Without this, switching between macOS and Windows produces whole-file diffs.
+* text=auto eol=lf
+
+# Windows-native scripts must keep CRLF or they misbehave when run.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+# Never touch binaries.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.mp4 binary
+*.mkv binary
+*.npz binary
+*.pt  binary
+*.onnx binary
+*.exe binary

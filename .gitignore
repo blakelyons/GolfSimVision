@@ -1,0 +1,46 @@
+# ---- Putting corpus -------------------------------------------------------
+# ~10 GB of regenerable PNG frames. Lives on the Windows capture machine.
+# Sync between machines with rsync, not git.
+corpus/
+prototypes/corpus/corpus/
+
+# ---- Python ---------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# ---- .NET (Phase 1+) ------------------------------------------------------
+bin/
+obj/
+*.user
+
+# ---- Models and media -----------------------------------------------------
+# Large binaries; ship via releases or LFS if they ever need versioning.
+*.pt
+*.onnx
+*.npz
+*.mkv
+*.mp4
+
+# ---- Local / machine-specific config --------------------------------------
+# ADR-0006: settings never live in a watched source tree, and never in git.
+settings.local.json
+*.local.json
+.env
+.env.*
+
+# ---- OS / editor ----------------------------------------------------------
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+
+# NOTE: prototypes/*/logs/ is deliberately NOT ignored.
+# GSPro protocol transcripts are evidence, not noise — docs/GSPRO_OPENCONNECT.md
+# is written from them.
