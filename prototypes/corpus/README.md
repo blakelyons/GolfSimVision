@@ -6,6 +6,11 @@ jitter and adversarial-case detection rate, per
 `docs/GolfSimVision-Phase0-Harness-Specs.md` §P0-1. See `SPEC.md` for the implementation
 decisions behind this layout.
 
+See `RUNBOOK.md` for the recommended order to actually build the corpus in a session —
+physical setup, auto-trigger baseline, manual collection, labelling, and rolling the
+results up into `docs/CAMERA_CAPABILITIES.md`. This file is the reference for what each
+tool does.
+
 ## Where things run
 
 | Tool | Machine | Why |

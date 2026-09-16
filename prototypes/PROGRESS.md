@@ -5,6 +5,23 @@ Newest entries on top.
 
 ---
 
+## 2026-09-16 — P0-1: RUNBOOK.md
+
+**What happened:** Added `prototypes/corpus/RUNBOOK.md`, mirroring P0-2's RUNBOOK: a
+physical-setup checklist, five phases (auto-trigger false-positive baseline first, since
+it's a standalone deliverable and its clips shouldn't count toward the 50+/20-adversarial
+targets; manual valid-putt + adversarial collection; ground-truth labelling; jitter
+characterization + baseline detector scoring; rollup into `docs/CAMERA_CAPABILITIES.md`).
+
+**Real gap flagged, not silently worked around:** `capture.py` has no CLI flags for
+`clip.json`'s `geometry`/`conditions` sections (camera height, mount, lighting, surface,
+ball) — only `--device-name`. Rather than change the CLI now, the runbook documents a
+copy-pasteable batch-edit snippet using `corpus.py`'s `load_clip`/`save_clip` to backfill
+these once per session, since they're constant within a session. Doc-only change, no
+code affected.
+
+---
+
 ## 2026-09-16 — P0-2: RUNBOOK.md
 
 **What happened:** `README.md` documents each of the 20 experiments individually but not
