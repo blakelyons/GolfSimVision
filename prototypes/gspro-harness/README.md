@@ -110,6 +110,10 @@ change clubs, play a hole, check you're at the menu) rather than sending a sweep
 themselves. Several (`exp02`–`exp04`, `exp09`, `exp12`) pause with `input()` between steps
 so you can screenshot or observe before continuing.
 
+exp06 in particular assumes a real launch monitor is physically hitting shots — with none
+connected, skip `--scenario` for it and drive `shot`/`putt` commands yourself from the
+plain REPL instead. See `RUNBOOK.md`'s Phase 2 entry for exp06.
+
 ## Testing
 
 Pure-logic tests, no GSPro or socket needed, run from `prototypes/gspro-harness/` on

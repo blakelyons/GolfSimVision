@@ -166,9 +166,10 @@ class Harness:
         if "ready" not in kv:
             print("usage: heartbeat ready=<bool> [detected=<bool>]")
             return
-        self.client.send_heartbeat(
-            ready=parse_bool(kv["ready"]), ball_detected=parse_bool(kv.get("detected", "false"))
-        )
+        ready = parse_bool(kv["ready"])
+        ball_detected = parse_bool(kv.get("detected", "false"))
+        self.client.send_heartbeat(ready=ready, ball_detected=ball_detected)
+        print(f"sent heartbeat (ready={ready} detected={ball_detected})")
 
     def cmd_putt(self, args: str) -> None:
         kv = parse_kv(args)
@@ -179,6 +180,7 @@ class Harness:
             return
         spin = float(kv["spin"]) if "spin" in kv else None
         self.client.send(self.codec.build_putt(speed=speed, hla=hla, vla=vla, spin=spin))
+        print(f"sent putt (speed={speed} hla={hla} vla={vla} spin={spin})")
 
     def cmd_shot(self, args: str) -> None:
         kv = parse_kv(args)
@@ -194,12 +196,14 @@ class Harness:
                 speed=speed, hla=hla, vla=vla, total_spin=total_spin, spin_axis=spin_axis
             )
         )
+        print(f"sent shot (speed={speed} hla={hla} vla={vla} spin={total_spin} spinaxis={spin_axis})")
 
     def cmd_raw(self, args: str) -> None:
         if not args.strip():
             print("usage: raw <literal JSON>")
             return
         self.client.send_raw(args.encode("utf-8"))
+        print(f"sent {len(args)} raw bytes")
 
     def cmd_shotnum(self, args: str) -> None:
         try:

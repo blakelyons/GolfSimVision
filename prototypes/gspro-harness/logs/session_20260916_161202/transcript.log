@@ -1,0 +1,36 @@
+16:12:02.840  GSPro << {"DeviceID":"GolfSimVision","Units":"Yards","ShotNumber":1789589522,"APIversion":"1","BallData":{"Speed":0.0,"SpinAxis":0.0,"TotalSpin":0.0,"BackSpin":0.0,"SideSpin":0.0,"HLA":0.0,"VLA":0.0,"CarryDistance":0.0},"ClubData":{"Speed":0.0,"AngleOfAttack":0.0,"FaceToTarget":0.0,"Lie":0.0,"Loft":0.0,"Path":0.0,"SpeedAtImpact":0.0,"VerticalFaceImpact":0.0,"HorizontalFaceImpact":0.0,"ClosureRate":0.0},"ShotDataOptions":{"ContainsBallData":false,"ContainsClubData":false,"LaunchMonitorIsReady":true,"LaunchMonitorBallDetected":false,"IsHeartBeat":true}}
+16:12:22.463  GSPro >> {"Code":201,"Message":"GSPro Player Information","Player":{"Handed":"RH","Club":"I9","DistanceToTarget":136.4,"Surface":null}}
+16:12:22.726  GSPro >> {"Code":201,"Message":"GSPro Player Information","Player":{"Handed":"RH","Club":"I9","DistanceToTarget":136.4,"Surface":null}}
+16:12:22.975  GSPro >> {"Code":201,"Message":"GSPro Player Information","Player":{"Handed":"RH","Club":"DR","DistanceToTarget":136.4,"Surface":null}}
+16:12:23.226  GSPro >> {"Code":201,"Message":"GSPro Player Information","Player":{"Handed":"RH","Club":"DR","DistanceToTarget":313.7,"Surface":null}}
+16:12:23.475  GSPro >> {"Code":201,"Message":"GSPro Player Information","Player":{"Handed":"RH","Club":"DR","DistanceToTarget":313.7,"Surface":null}}
+16:12:23.724  GSPro >> {"Code":201,"Message":"GSPro Player Information","Player":{"Handed":"RH","Club":"DR","DistanceToTarget":370.3,"Surface":null}}
+16:12:23.971  GSPro >> {"Code":202,"Message":"GSPro ready","Player":null}
+16:12:24.219  GSPro >> {"Code":201,"Message":"GSPro Player Information","Player":{"Handed":"RH","Club":"DR","DistanceToTarget":370.3,"Surface":null}}
+16:12:24.468  GSPro >> {"Code":201,"Message":"GSPro Player Information","Player":{"Handed":"RH","Club":"DR","DistanceToTarget":392.0,"Surface":null}}
+16:12:28.477  GSPro >> {"Code":201,"Message":"GSPro Player Information","Player":{"Handed":"RH","Club":"W3","DistanceToTarget":392.0,"Surface":null}}
+16:12:28.725  GSPro >> {"Code":201,"Message":"GSPro Player Information","Player":{"Handed":"RH","Club":"W3","DistanceToTarget":392.0,"Surface":null}}
+16:12:30.475  GSPro >> {"Code":201,"Message":"GSPro Player Information","Player":{"Handed":"RH","Club":"I2","DistanceToTarget":392.0,"Surface":null}}
+16:12:30.724  GSPro >> {"Code":201,"Message":"GSPro Player Information","Player":{"Handed":"RH","Club":"I2","DistanceToTarget":392.0,"Surface":null}}
+16:12:31.721  GSPro >> {"Code":201,"Message":"GSPro Player Information","Player":{"Handed":"RH","Club":"I4","DistanceToTarget":392.0,"Surface":null}}
+16:12:31.967  GSPro >> {"Code":201,"Message":"GSPro Player Information","Player":{"Handed":"RH","Club":"I4","DistanceToTarget":392.0,"Surface":null}}
+16:12:33.473  GSPro >> {"Code":201,"Message":"GSPro Player Information","Player":{"Handed":"RH","Club":"I5","DistanceToTarget":392.0,"Surface":null}}
+16:12:33.719  GSPro >> {"Code":201,"Message":"GSPro Player Information","Player":{"Handed":"RH","Club":"I5","DistanceToTarget":392.0,"Surface":null}}
+16:12:34.719  GSPro >> {"Code":201,"Message":"GSPro Player Information","Player":{"Handed":"RH","Club":"I6","DistanceToTarget":392.0,"Surface":null}}
+16:12:34.963  GSPro >> {"Code":201,"Message":"GSPro Player Information","Player":{"Handed":"RH","Club":"I6","DistanceToTarget":392.0,"Surface":null}}
+16:12:35.713  GSPro >> {"Code":201,"Message":"GSPro Player Information","Player":{"Handed":"RH","Club":"I7","DistanceToTarget":392.0,"Surface":null}}
+16:12:35.963  GSPro >> {"Code":201,"Message":"GSPro Player Information","Player":{"Handed":"RH","Club":"I7","DistanceToTarget":392.0,"Surface":null}}
+16:12:37.474  GSPro >> {"Code":201,"Message":"GSPro Player Information","Player":{"Handed":"RH","Club":"I8","DistanceToTarget":392.0,"Surface":null}}
+16:12:37.723  GSPro >> {"Code":201,"Message":"GSPro Player Information","Player":{"Handed":"RH","Club":"I8","DistanceToTarget":392.0,"Surface":null}}
+16:12:39.722  GSPro >> {"Code":201,"Message":"GSPro Player Information","Player":{"Handed":"RH","Club":"I9","DistanceToTarget":392.0,"Surface":null}}
+16:12:39.969  GSPro >> {"Code":201,"Message":"GSPro Player Information","Player":{"Handed":"RH","Club":"I9","DistanceToTarget":392.0,"Surface":null}}
+16:12:41.712  GSPro >> {"Code":201,"Message":"GSPro Player Information","Player":{"Handed":"RH","Club":"PW","DistanceToTarget":392.0,"Surface":null}}
+16:12:41.964  GSPro >> {"Code":201,"Message":"GSPro Player Information","Player":{"Handed":"RH","Club":"PW","DistanceToTarget":392.0,"Surface":null}}
+16:12:42.968  GSPro >> {"Code":201,"Message":"GSPro Player Information","Player":{"Handed":"RH","Club":"GW","DistanceToTarget":392.0,"Surface":null}}
+16:12:43.215  GSPro >> {"Code":201,"Message":"GSPro Player Information","Player":{"Handed":"RH","Club":"GW","DistanceToTarget":392.0,"Surface":null}}
+16:12:44.473  GSPro >> {"Code":201,"Message":"GSPro Player Information","Player":{"Handed":"RH","Club":"SW","DistanceToTarget":392.0,"Surface":null}}
+16:12:44.721  GSPro >> {"Code":201,"Message":"GSPro Player Information","Player":{"Handed":"RH","Club":"SW","DistanceToTarget":392.0,"Surface":null}}
+16:12:45.718  GSPro >> {"Code":201,"Message":"GSPro Player Information","Player":{"Handed":"RH","Club":"LW","DistanceToTarget":392.0,"Surface":null}}
+16:12:45.967  GSPro >> {"Code":201,"Message":"GSPro Player Information","Player":{"Handed":"RH","Club":"LW","DistanceToTarget":392.0,"Surface":null}}
+16:12:46.976  GSPro >> {"Code":201,"Message":"GSPro Player Information","Player":{"Handed":"RH","Club":"PT","DistanceToTarget":392.0,"Surface":null}}
+16:12:47.225  GSPro >> {"Code":201,"Message":"GSPro Player Information","Player":{"Handed":"RH","Club":"PT","DistanceToTarget":392.0,"Surface":null}}

@@ -9,8 +9,11 @@ QUESTION = (
 
 
 def run(client) -> None:
-    # See connect_and_announce's docstring -- a bare connect isn't enough for GSPro
-    # to recognize the client.
+    # This mode only works with a real launch monitor physically hitting shots --
+    # --scenario can't take shot/putt commands mid-run, only this one input(). With no
+    # physical monitor connected, don't use --scenario for this experiment at all: run
+    # the plain REPL (`python harness.py`) instead and drive `shot`/`putt` yourself. See
+    # RUNBOOK.md's Phase 2 entry for exp06.
     connect_and_announce(client)
-    print("Play a hole normally in GSPro now, tee to green.")
+    print("Play a hole normally in GSPro now (real launch monitor swings), tee to green.")
     input("Press Enter once you've holed out... ")

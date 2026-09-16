@@ -5,6 +5,52 @@ Newest entries on top.
 
 ---
 
+## 2026-09-16 — P0-2: exp05 (clean re-run) + exp06, readiness-indicator mystery solved
+
+**What happened:** Re-ran `exp05_club_change` cleanly with the `connect_and_announce`
+fix — cycled the full bag, `Club` confirmed to read `"PT"` for the putter. Then ran
+`exp06_distance_to_target` entirely through the REPL's `shot`/`putt` commands (no
+physical launch monitor connected — the runbook's wording assumed one, which was
+wrong; fixed `exp06_distance_to_target.py`, `RUNBOOK.md`, and `README.md` to say so).
+Played through three holes' worth of simulated shots.
+
+**exp06 answered:** yes, `DistanceToTarget` updates per shot correctly, in yards, and
+GSPro auto-advances holes and auto-selects clubs (confirmed selecting `PT` automatically
+near the pin, matching exp05's finding).
+
+**Readiness-indicator mystery solved (refines, doesn't overturn, the earlier headline
+answer):** Blake saw the indicator go solid green mid-round and asked whether our
+earlier conclusion was wrong. Ran the decisive test — `heartbeat ready=false` while
+actively mid-round, ball in play — indicator stayed green. This is now the third
+confirmation that `LaunchMonitorIsReady` never drives it, under any condition. What
+does correlate: GSPro sends an inbound `{"Code":202,"Message":"GSPro ready"}` a few
+seconds after each shot's `200` ack, once it's ready for the next one — almost
+certainly what the UI light actually reflects, independent of anything we send.
+
+**New response codes found (undocumented in the harness spec, and — checked against
+`../example-apps/openflight-.../src/openflight/gspro/codec.py` — undocumented there
+too, silently dropped by its `parse_inbound()`):**
+- `200 "Ball Data received"` — the spec's generic "200 = shot received" now has exact
+  wording.
+- `202 "GSPro ready"` — see above.
+- `203 "GSPro round ended"` — fired twice, unexplained, didn't actually stop anything
+  (play continued normally through two more holes). Flagged as a benign anomaly for now.
+
+**Cross-checked the openflight reference's heartbeat design** (`sim/transport.py`):
+it runs a continuous background heartbeat thread (~5s) whenever idle — confirms our
+`connect_and_announce()` fix is a faster version of the same idea their `on_connect_bytes()`
+(which returns `None` for GSPro) doesn't shortcut either. Full comparison notes in
+`logs/session_20260916_162907/NOTES.md`.
+
+**Also fixed:** `shot`/`putt`/`heartbeat`/`raw` REPL commands printed nothing on
+success (only `shotnum` did) — added confirmation output to all four, matching
+`shotnum`'s existing pattern.
+
+Suite: 38/38 (unchanged — `test_harness.py`'s REPL/scenario dispatch is documented as
+exercised by hand against live GSPro, not stdlib-tested, and that precedent holds).
+
+---
+
 ## 2026-09-16 — P0-2: first live GSPro session — Phase 1 complete, two harness bugs found and fixed
 
 **What happened:** Ran experiments 1, 17, 2, 3, and 4 against live GSPro for the first

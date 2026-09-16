@@ -57,7 +57,7 @@ Start a round in GSPro. These experiments use it the way a player normally would
 | # | Scenario | Note |
 |---|---|---|
 | 5 | `exp05_club_change` | cycle the full bag, confirm `Club` reads `PT` for putter |
-| 6 | `exp06_distance_to_target` | play a hole tee → green normally — this is the longest single experiment here |
+| 6 | `exp06_distance_to_target` | **no physical launch monitor needed** — skip `--scenario` for this one and run the plain REPL (`python harness.py`) instead, driving `shot`/`putt` commands yourself tee → green (e.g. `shot speed=150 hla=0 vla=12 spin=2500` for a tee shot, smaller `shot`s for approaches, `putt` to hole out); watch `DistanceToTarget` after each one. REPL mode doesn't auto-write `NOTES.md` — write it by hand afterward (see `logs/session_20260916_145904/NOTES.md` for the pattern). The longest single experiment here. |
 | 7 | `exp07_full_shot` | driver-range numbers, confirms shots play at all |
 | 8 | `exp08_putt_vla_zero` | baseline putt |
 | 9 | `exp09_vla_sweep` | pauses between each VLA value — watch which looks right on screen |
