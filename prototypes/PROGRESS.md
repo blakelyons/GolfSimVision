@@ -5,6 +5,47 @@ Newest entries on top.
 
 ---
 
+## 2026-09-16 — P0-2: first live GSPro session — Phase 1 complete, two harness bugs found and fixed
+
+**What happened:** Ran experiments 1, 17, 2, 3, and 4 against live GSPro for the first
+time. Found and fixed two real harness bugs live, and closed the headline question.
+
+- **Bug 1 — no shutdown grace period.** `run_scenario()` disconnected immediately after
+  `module.run()` returned, racing any in-flight GSPro response. Found via exp17 (a sent
+  putt showed up in the transcript with no response at all). Fixed: `harness.py` now
+  waits `_SCENARIO_SHUTDOWN_GRACE_SECONDS` (2s) before shutdown.
+- **Bug 2 — bare TCP connect isn't enough for GSPro to register a client.** Discovered
+  live during exp05: GSPro's Connect window stayed "Not Connected" and produced zero
+  `201`s on club changes, despite our socket connecting successfully. One heartbeat
+  fixed it immediately (confirmed via manual REPL testing, `logs/session_20260916_145904`).
+  Root cause: exp01/exp05/exp06/exp17 only call `connect_and_wait()` and then sit idle —
+  they never send anything, so GSPro never saw them as real clients. Fixed: added
+  `scenarios.connect_and_announce()` (connect + one heartbeat) and switched all four to
+  use it. Re-ran exp01 and exp17 afterward — their original results predated the fix and
+  were unreliable; the re-runs are the trustworthy ones.
+- **Confound, not a bug:** a `.NET` error and unrelated shot activity during one exp04
+  run turned out to coincide with a concurrent Garmin app / E6 Connect pairing attempt —
+  a completely separate GSPro subsystem from this harness's OpenConnect socket. Added a
+  prerequisite to `RUNBOOK.md`: close the Garmin app and leave the physical R10 powered
+  off before running these experiments; it's not needed for any of them.
+- **Doc fix:** `README.md` claimed the GSPro menu path was "Connect > OpenConnect (E6
+  Direct)" — never actually verified against GSPro's UI. Corrected to **Connect >
+  OpenAPI** per what Blake's GSPro actually shows.
+
+**Headline question closed:** `LaunchMonitorIsReady` does not drive GSPro's readiness
+indicator, confirmed under every condition tested (no round, active round, and — the
+decisive test — toggling the flag live via the REPL against a connection GSPro had
+already registered). See `logs/session_20260916_145904/NOTES.md` for the full reasoning.
+
+**Also answered:** exp17 — a shot with no round active is silently ignored (no response
+of any kind, not even an error). exp01 — GSPro sends nothing unprompted once connected,
+as long as no heartbeat/shot traffic follows.
+
+Added `TestConnectAndAnnounce` to `test_scenarios.py` covering the new helper. Suite now
+38/38.
+
+---
+
 ## 2026-09-16 — P0-1: RUNBOOK.md
 
 **What happened:** Added `prototypes/corpus/RUNBOOK.md`, mirroring P0-2's RUNBOOK: a

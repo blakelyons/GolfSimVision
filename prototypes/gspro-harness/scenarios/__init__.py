@@ -30,3 +30,17 @@ def connect_and_wait(client: GSProDirect, timeout: float = 10.0) -> None:
             return
         time.sleep(0.05)
     raise TimeoutError(f"did not connect within {timeout}s")
+
+
+def connect_and_announce(client: GSProDirect, ready: bool = True, timeout: float = 10.0) -> None:
+    """connect_and_wait(), then send one heartbeat.
+
+    Discovered live (2026-09-16, exp05 retest): a bare TCP connect isn't enough for
+    GSPro to register a client -- its own Connect window stayed "Not Connected" and
+    produced no 201s on club changes until a single heartbeat went out, after which
+    both worked immediately. Scenarios that only connect-and-wait for something to
+    happen (1, 5, 6, 17) need this instead of connect_and_wait() or GSPro may never
+    actually be looking at them.
+    """
+    connect_and_wait(client, timeout=timeout)
+    client.send_heartbeat(ready=ready)

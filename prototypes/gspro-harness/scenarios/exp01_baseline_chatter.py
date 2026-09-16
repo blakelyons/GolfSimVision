@@ -2,13 +2,18 @@
 
 import time
 
-from . import connect_and_wait
+from . import connect_and_announce
 
-QUESTION = "What does GSPro send unprompted, with no heartbeat or shot traffic, over 60s?"
+QUESTION = (
+    "After one heartbeat registers the connection, what does GSPro send unprompted "
+    "over the next 60s with no further heartbeat or shot traffic?"
+)
 
 
 def run(client) -> None:
-    connect_and_wait(client)
-    input("Connected. Press Enter to start 60s of passive listening... ")
+    # A bare TCP connect isn't enough for GSPro to recognize the client (discovered
+    # live during exp05) -- one heartbeat first, then genuinely nothing for 60s.
+    connect_and_announce(client)
+    input("Connected and announced. Press Enter to start 60s of passive listening... ")
     time.sleep(60)
     print("done -- check transcript.log for anything GSPro sent unprompted")

@@ -7,10 +7,13 @@ Run: python -m unittest (from prototypes/gspro-harness/, either machine).
 
 import importlib
 import inspect
+import json
 import pkgutil
 import unittest
 
 import scenarios
+from protocol import ConnectionState, GSProDirect
+from test_protocol import FakeGSProServer
 
 
 def _experiment_modules():
@@ -19,6 +22,30 @@ def _experiment_modules():
         for _, name, is_pkg in pkgutil.iter_modules(scenarios.__path__)
         if not is_pkg and name.startswith("exp")
     )
+
+
+class TestConnectAndAnnounce(unittest.TestCase):
+    """Covers the fix from the 2026-09-16 live session: a bare TCP connect wasn't
+    enough for GSPro to register the client (no 201s, Connect window stayed "Not
+    Connected") until one heartbeat went out. connect_and_announce() sends that
+    heartbeat; this confirms it actually does, with the requested ready value."""
+
+    def setUp(self):
+        self.server = FakeGSProServer()
+        self.client = GSProDirect(
+            host="127.0.0.1", port=self.server.port, device_id="GolfSimVision",
+            backoff_seconds=(0.05, 0.05, 0.1),
+        )
+        self.addCleanup(self.client.disconnect)
+        self.addCleanup(self.server.close)
+
+    def test_sends_exactly_one_heartbeat_with_requested_ready_value(self):
+        scenarios.connect_and_announce(self.client, ready=False)
+
+        self.assertEqual(self.client.state, ConnectionState.CONNECTED)
+        frame = json.loads(self.server.recv_frame())
+        self.assertEqual(frame["ShotDataOptions"]["IsHeartBeat"], True)
+        self.assertEqual(frame["ShotDataOptions"]["LaunchMonitorIsReady"], False)
 
 
 class TestScenarioContract(unittest.TestCase):

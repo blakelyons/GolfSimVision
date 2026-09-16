@@ -17,6 +17,18 @@ same machine (port 921 is loopback-only).
 - [ ] A screenshot tool is ready (Win+Shift+S is fine) for experiments 3-4.
 - [ ] `python -m unittest` passes in this folder (confirms the harness itself is sound
       before you spend time on live GSPro runs).
+- [ ] **The Garmin app / any other GSPro client is fully closed**, and the physical R10
+      is powered off or otherwise not attempting to pair. Discovered live 2026-09-16: a
+      concurrent Garmin-app E6 Connect attempt (even a failed one) is a strong suspect
+      for a GSPro-side `.NET` error and unrelated shot activity during an experiment.
+      You don't need the physical R10 for any of these 20 experiments — this harness
+      stands in for it entirely.
+
+**Also discovered live 2026-09-16:** a bare TCP connect isn't enough for GSPro to
+register a client — its Connect window can stay "Not Connected" and it won't push `201`s
+on club changes until the client sends at least one heartbeat. Scenarios 1, 5, 6, and 17
+(the ones that only connect and wait for something to happen) now send one heartbeat
+first via `connect_and_announce()` before doing anything else, for exactly this reason.
 
 Run everything from `prototypes/gspro-harness/`:
 ```

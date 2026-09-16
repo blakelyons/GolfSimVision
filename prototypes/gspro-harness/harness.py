@@ -23,6 +23,8 @@ LOGS_DIR = Path(__file__).parent / "logs"
 
 TRUE_STRINGS = {"1", "true", "t", "yes", "y"}
 
+_SCENARIO_SHUTDOWN_GRACE_SECONDS = 2.0
+
 
 def parse_kv(args: str) -> Dict[str, str]:
     """'speed=5.0 hla=-1.5 vla=0' -> {'speed': '5.0', 'hla': '-1.5', 'vla': '0'}"""
@@ -265,6 +267,13 @@ class Harness:
         print(f"scenario: {name}\nquestion: {question}")
         try:
             module.run(self.client)
+            # Grace period so a response to the scenario's last send has time to
+            # arrive before shutdown() disconnects -- scenarios that send once and
+            # return (7, 8, 13, 14, 17, 19, 20) would otherwise race GSPro's reply
+            # against the socket closing, as exp17 did in practice: the outbound
+            # putt landed in transcript.log with no inbound response at all.
+            print(f"[harness] waiting {_SCENARIO_SHUTDOWN_GRACE_SECONDS}s for any trailing response...")
+            time.sleep(_SCENARIO_SHUTDOWN_GRACE_SECONDS)
         finally:
             self.shutdown()
 

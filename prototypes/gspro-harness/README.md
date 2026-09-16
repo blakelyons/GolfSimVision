@@ -16,8 +16,8 @@ session, and how to roll the results up into `docs/GSPRO_OPENCONNECT.md` /
 
 - Python 3 (standard library only — `socket`, `json`, `dataclasses`, `threading`, `enum`,
   `time`, `argparse`, `unittest`). No `requirements.txt`, nothing to `pip install`.
-- GSPro running on the same Windows PC, with **Connect > OpenConnect (E6 Direct)**
-  active, before you run `connect` (REPL) or a scenario.
+- GSPro running on the same Windows PC, with **Connect > OpenAPI** active, before you
+  run `connect` (REPL) or a scenario.
 - For scenarios that ask you to screenshot GSPro's UI: have a screenshot tool ready and
   drop the images into that scenario's `logs/session_<ts>/` folder.
 
