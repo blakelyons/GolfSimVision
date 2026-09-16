@@ -5,6 +5,21 @@ Newest entries on top.
 
 ---
 
+## 2026-09-16 — P0-2: RUNBOOK.md
+
+**What happened:** `README.md` documents each of the 20 experiments individually but not
+the order to run them in or what to do with the results, so added
+`prototypes/gspro-harness/RUNBOOK.md`: a prerequisites checklist, four phases grouped by
+what state GSPro needs to be in (menu-only → active round, normal play → active round,
+deliberately-abnormal input → connection-drop/resilience last), and a rollup step
+describing what goes into `docs/GSPRO_OPENCONNECT.md` and `docs/GSPRO_PUTTING.md` once
+every experiment's `NOTES.md` is filled in. Edge-case experiments (13/14/19/20, which
+probe malformed input and error responses) and the reconnect experiment (16) are
+deliberately sequenced last, so a connection drop there doesn't cost data from earlier
+experiments. Doc-only change, no code affected.
+
+---
+
 ## 2026-09-16 — P0-1: corpus.py, capture.py, label.py, replay.py, stats.py
 
 **What happened:** Built all of P0-1 in one pass (`prototypes/corpus/`), following the

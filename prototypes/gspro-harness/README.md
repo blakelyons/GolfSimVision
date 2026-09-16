@@ -8,6 +8,10 @@ the future C# `SimulatorConnector`/`GSProDirect`.
 **Ships:** nothing. **Runs on:** the Windows PC, always — GSPro listens on
 `127.0.0.1:921` and this harness must be on the same machine.
 
+See `RUNBOOK.md` for the recommended order to actually run all 20 experiments in a
+session, and how to roll the results up into `docs/GSPRO_OPENCONNECT.md` /
+`docs/GSPRO_PUTTING.md` afterward. This file is the reference for what each one does.
+
 ## Prerequisites
 
 - Python 3 (standard library only — `socket`, `json`, `dataclasses`, `threading`, `enum`,
