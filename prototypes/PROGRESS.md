@@ -5,6 +5,88 @@ Newest entries on top.
 
 ---
 
+## 2026-09-16 — P0-1: corpus.py, capture.py, label.py, replay.py, stats.py
+
+**What happened:** Built all of P0-1 in one pass (`prototypes/corpus/`), following the
+same `SPEC.md`-then-tickets pattern used for P0-2. Skipped a `/grilling` interview first
+since the harness spec already answers nearly every implementation question in detail;
+`SPEC.md` records the handful of decisions it doesn't (shared `corpus.py` data model,
+testable-core/untestable-shell split for the two interactive tools, detector-as-plugin
+layout for `replay.py`).
+
+- `corpus.py` — dataclasses matching the harness spec's `clip.json` example field-for-
+  field, plus `save_clip`/`load_clip`/`append_index_entry`/`read_index`/`next_clip_id`.
+  Every other tool reads/writes clips through this instead of touching JSON directly.
+- `stats.py` — jitter report (median/p95/max/stdev/gap-count) + text histogram + corpus
+  summary CLI.
+- `capture.py` — webcam capture tool. `RingBuffer`, camera-open-with-readback-logging
+  (MJPG set before width/height/fps, actual settings read back and compared against
+  requested), clip-save/naming, `--auto-trigger` frame-diff mode. The `cv2.VideoCapture`/
+  `imshow`/keyboard loop is an untested interactive shell around otherwise-tested pure
+  functions — no display or physical mat available from here to drive it.
+- `label.py` — two-gate manual timing (`speed = gate_distance_mm / dt`) and ramp-release
+  timing (`v = sqrt(10*g*h/7)`) ground truth, tier-2 per-frame label storage, plus an
+  untested interactive frame-stepper shell for the same reason as `capture.py`.
+- `replay.py` + `detectors/cam_putting_baseline.py` — the `Detector` protocol
+  (`reset()`/`push_frame(t, frame) -> Optional[PuttMeasurement]`), full scorecard (TP/FN/
+  FP/double-fire, speed/HLA error percentiles vs. ground truth, track-point distribution,
+  rejections by reason code), and a baseline detector ported from `cam-putting-py`'s
+  contour-tracking + ball-radius-scale + two-gate-timing approach.
+- `README.md` — how to run each tool and on which machine, the scorecard field
+  reference, testing notes, unchanged exit criteria.
+
+**Spec tension flagged, not silently resolved:** the harness spec says `capture.py`
+stores **grayscale-only** PNGs (§1), but also says the baseline detector is "a straight
+port of cam-putting-py's approach (**HSV** + two-sample gate + ball-radius scale)" (§5).
+Grayscale has no hue/saturation channel, so true HSV masking isn't possible against this
+corpus. Resolved by thresholding on grayscale brightness instead — functionally the same
+selectivity as the original's "white ball" HSV range (which is itself mostly a brightness
+condition) and the only ball color a grayscale corpus can support. Documented in the
+detector's module docstring and in `README.md`, not silently patched over.
+
+**Environment note:** `pip install` on this machine fails during console-script
+generation (`pip._vendor.distlib` is missing its launcher `.exe` resources — looks
+AV/EDR-stripped). Worked around by `pip download`-ing `numpy`/`opencv-python` and
+extracting the wheels directly into site-packages. Documented in `requirements.txt` in
+case it recurs.
+
+Suite: 53/53 (`python -m unittest discover`).
+
+**Code review fixes** (two-axis, same pattern as P0-2 — reviewed as new code since
+nothing was committed yet):
+
+- **Spec axis, real gap:** `capture.py`'s `run()` did `cap.read()` → `cv2.imshow()` →
+  `cv2.waitKey()` all in one synchronous loop — display work sat directly on the capture
+  path, contradicting the harness spec's "Single dedicated capture thread... No
+  processing, no encoding, no display work on this thread" and "preview must never gate
+  or block capture." There was also no rolling-FPS/ring-fill/last-clip readout at all.
+  Fixed: added a `CaptureWorker` background thread that does nothing but
+  read→timestamp→ring-append; the main thread now owns the ~15fps preview (with the
+  required readout) and keyboard handling against `RingBuffer.latest()`, so it can never
+  block capture. `RingBuffer` gained a lock (two threads touch it now) and a `latest()`
+  method.
+- **Spec axis, real bug:** `capture.py` stored `jitter_report()`'s raw dict verbatim as
+  `clip.json`'s `interval_ms`, which uses `"stdev"` and duplicates `gap_count` inside it —
+  the harness spec's own `clip.json` example uses `{"median","p95","max","jitter_sd"}`
+  with no nested `gap_count`. Fixed: `build_clip_metadata` now maps to the exact spec
+  field names.
+- **Spec axis, partial:** `replay.py`'s `track_points` scorecard metric was only
+  min/max/mean; the spec asks for a "distribution of points per measurement." Added a
+  frequency-histogram `counts` field alongside min/max/mean.
+- **Standards axis, judgement calls fixed:** deduped `capture.py`'s two near-identical
+  `save_ring_buffer_as_clip(...)` call sites (auto-trigger vs. `SPACE`) into one `save()`
+  closure, and `stats.py`'s two independent interval-gathering loops (`corpus_summary`
+  vs. `main --histogram`) into one `all_intervals_ms()` helper.
+- **Standards axis, judgement calls left alone:** mm/s→mph done two different ways
+  between `label.py` and the ported baseline detector (detector's shape is deliberately
+  preserved for traceability to the original), and the `(requested, actual, device_name,
+  diagnostic_props)` data clump threaded through `capture.py` — both minor, Phase-0-
+  throwaway-appropriate, not worth the abstraction.
+
+Suite now 58/58. `README.md` updated to describe the real capture/display-thread split.
+
+---
+
 ## 2026-09-16 — P0-2 ticket 6: README.md (final ticket)
 
 **What happened:** Added `README.md` covering prerequisites (stdlib-only Python, GSPro

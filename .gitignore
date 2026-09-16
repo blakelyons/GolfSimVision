@@ -1,8 +1,9 @@
 # ---- Putting corpus -------------------------------------------------------
 # ~10 GB of regenerable PNG frames. Lives on the Windows capture machine.
 # Sync between machines with rsync, not git.
-corpus/
-prototypes/corpus/corpus/
+# NOTE: must stay anchored (leading slash) -- an unanchored `corpus/` also matches
+# prototypes/corpus/, the source tree for the P0-1 tools, and swallows it whole.
+/prototypes/corpus/corpus/
 
 # ---- Python ---------------------------------------------------------------
 __pycache__/

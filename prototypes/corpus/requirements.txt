@@ -1,0 +1,15 @@
+numpy
+opencv-python
+
+# On this dev machine, `pip install` fails during console-script generation:
+#   ValueError: Unable to find resource t64.exe in package pip._vendor.distlib
+# pip's vendored distlib is missing its launcher .exe stubs (looks AV/EDR-stripped, not
+# a project issue). Workaround -- download the wheels, then extract them straight into
+# site-packages (bypasses the broken script-generation step entirely; neither package
+# needs console scripts):
+#
+#   python -m pip download --no-deps -d <tmpdir> numpy opencv-python
+#   python -m zipfile -e <tmpdir>/numpy-*.whl "<site-packages>/"
+#   python -m zipfile -e <tmpdir>/opencv_python-*.whl "<site-packages>/"
+#
+# If `pip install -r requirements.txt` works normally on your machine, just use that.
