@@ -1,6 +1,6 @@
 """Experiment 15 -- ack correlation."""
 
-from . import connect_and_wait, make_codec
+from . import connect_and_announce, make_codec
 
 QUESTION = (
     "Sending 3 shots in rapid succession, how many 200 responses come back, "
@@ -9,7 +9,7 @@ QUESTION = (
 
 
 def run(client) -> None:
-    connect_and_wait(client)
+    connect_and_announce(client)
     codec = make_codec(client)
     for i in range(3):
         payload = codec.build_putt(speed=5 + i, hla=0, vla=0, spin=0)

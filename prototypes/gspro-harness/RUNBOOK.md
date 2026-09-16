@@ -24,6 +24,23 @@ same machine (port 921 is loopback-only).
       You don't need the physical R10 for any of these 20 experiments — this harness
       stands in for it entirely.
 
+## Troubleshooting: a scenario shows correct traffic in transcript.log but GSPro does nothing
+
+**Try Settings > Game > Reset GSPro Connect in GSPro, then re-run the scenario.**
+
+Discovered live 2026-09-16 (exp07 retest) with a clean before/after: identical harness
+code, identical payload, identical `connect_and_announce` delay -- one run got zero
+response (`logs/session_20260916_171013`), then with *no code change at all*, doing
+Settings > Game > Reset GSPro Connect in between, the very next run got an immediate
+`200 "Ball Data received"` (`logs/session_20260916_171044`). This harness connects and
+disconnects on every single `--scenario` invocation -- dozens of times in a normal
+session -- and GSPro's OpenAPI connection handling appears to degrade under that churn
+in a way a fresh TCP connect alone doesn't fix. `connect_and_announce`'s settle delay
+(`scenarios/__init__.py`) was suspected as the cause of earlier dropped shots and tuned
+up from 2s to 5s, but this result suggests that was likely the wrong lever the whole
+time -- keep the delay as reasonable hygiene, but reach for a GSPro-side reset first if
+a shot goes missing.
+
 **Also discovered live 2026-09-16:** a bare TCP connect isn't enough for GSPro to
 register a client — its Connect window can stay "Not Connected" and it won't push `201`s
 on club changes until the client sends at least one heartbeat. Scenarios 1, 5, 6, and 17

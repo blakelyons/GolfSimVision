@@ -2,7 +2,7 @@
 
 import json
 
-from . import connect_and_wait
+from . import connect_and_announce
 
 QUESTION = (
     "What error code (if any) comes back for a payload missing a required "
@@ -12,7 +12,7 @@ QUESTION = (
 
 
 def run(client) -> None:
-    connect_and_wait(client)
+    connect_and_announce(client)
 
     missing_field = {
         "DeviceID": client.device_id,

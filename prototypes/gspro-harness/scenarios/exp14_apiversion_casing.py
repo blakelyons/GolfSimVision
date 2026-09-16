@@ -2,7 +2,7 @@
 
 import json
 
-from . import connect_and_wait
+from . import connect_and_announce
 
 QUESTION = (
     "Is APIversion casing checked? gspro-r10.exe sends the capital-V form "
@@ -29,7 +29,7 @@ def _shot_json(client, key: str) -> bytes:
 
 
 def run(client) -> None:
-    connect_and_wait(client)
+    connect_and_announce(client)
 
     client.send_raw(_shot_json(client, key="APIversion"))
     print("sent with lowercase-v key 'APIversion' (spec-correct)")

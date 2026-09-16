@@ -5,6 +5,40 @@ Newest entries on top.
 
 ---
 
+## 2026-09-16 — P0-2: exp07 done, real root cause of dropped shots found (not a delay tuning problem)
+
+**What happened:** Switched all 13 remaining scenarios (07-16, 18-20) from
+`connect_and_wait` to `connect_and_announce`, since they all shared exp17's exact
+"send a real payload immediately after connecting" shape that needed the earlier fix.
+Then hit a new, confusing round of dropped shots trying to run `exp07_full_shot`:
+
+1. First attempt (2s settle delay): dropped, zero response, on the range.
+2. Same result on an actual course.
+3. A manual REPL shot succeeded ~5 minutes after connecting, with **no heartbeat at
+   all** before it -- directly contradicting "a heartbeat registers the client."
+   Bumped the settle delay to 5.0s (matching `openflight/sim/transport.py`'s default
+   `heartbeat_interval_s`) as a principled guess rather than a random number.
+4. Re-ran with 5.0s: still dropped.
+5. Did Settings > Game > Reset GSPro Connect in GSPro, re-ran with **no code change
+   at all**: immediate `200 "Ball Data received"`, ball visibly played.
+
+**Real root cause: this harness's connect/disconnect churn (one full cycle per
+`--scenario` invocation, dozens of times in a session) appears to degrade GSPro's
+OpenAPI connection handling over time, independent of any delay tuning.** A GSPro-side
+reset is the actual fix. Documented as a Troubleshooting entry in `RUNBOOK.md`, and
+corrected `connect_and_announce`'s docstring in `scenarios/__init__.py` to stop
+claiming the delay itself was the mechanism -- it's kept as reasonable hygiene, not as
+the confirmed fix. Backfilled `NOTES.md` in the four failed exp07 session folders
+pointing to the one that succeeded, so the evidence trail stays coherent.
+
+**exp07 answered:** yes, a full driver-range shot plays correctly; response code is
+`200 "Ball Data received"`.
+
+Suite: 38/38 (slower now, ~9s, due to the 5.0s settle delay in
+`TestConnectAndAnnounce`).
+
+---
+
 ## 2026-09-16 — P0-2: exp05 (clean re-run) + exp06, readiness-indicator mystery solved
 
 **What happened:** Re-ran `exp05_club_change` cleanly with the `connect_and_announce`

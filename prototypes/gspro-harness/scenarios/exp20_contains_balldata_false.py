@@ -1,12 +1,12 @@
 """Experiment 20 -- ContainsBallData false + BallData present."""
 
-from . import connect_and_wait, make_codec
+from . import connect_and_announce, make_codec
 
 QUESTION = "When ContainsBallData is false but a full BallData object is present anyway, which does GSPro honor?"
 
 
 def run(client) -> None:
-    connect_and_wait(client)
+    connect_and_announce(client)
     codec = make_codec(client)
     payload = codec.build_putt(speed=5, hla=0, vla=0, spin=0)
     payload.ShotDataOptions.ContainsBallData = False

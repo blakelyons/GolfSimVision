@@ -2,7 +2,7 @@
 
 import time
 
-from . import connect_and_wait, make_codec
+from . import connect_and_announce, make_codec
 
 QUESTION = (
     "After a dropped connection (RST, not a clean close) and reconnect, does "
@@ -11,7 +11,7 @@ QUESTION = (
 
 
 def run(client) -> None:
-    connect_and_wait(client)
+    connect_and_announce(client)
     codec = make_codec(client)
 
     client.send(codec.build_putt(speed=5, hla=0, vla=0, spin=0))
@@ -20,7 +20,10 @@ def run(client) -> None:
 
     client.drop()
     print("dropped the raw socket (RST) -- reconnect/backoff loop should take over")
-    connect_and_wait(client, timeout=30.0)
+    # Announce again after reconnecting too -- otherwise we can't tell whether GSPro
+    # failing to respond to the post-reconnect putt means "GSPro didn't recover" or
+    # just "we're unregistered again," the same registration issue found live in exp05.
+    connect_and_announce(client, timeout=30.0)
     print("reconnected")
 
     client.send(codec.build_putt(speed=5, hla=0, vla=0, spin=0))
