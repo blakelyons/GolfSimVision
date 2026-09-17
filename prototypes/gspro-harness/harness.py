@@ -114,8 +114,8 @@ class Harness:
             port=port,
             device_id=device_id,
             units=units,
-            on_send=self.transcript.outbound,
-            on_receive=self.transcript.inbound,
+            on_send=self._on_send,
+            on_receive=self._on_receive,
             on_response=self._on_response,
             on_status=self._on_status,
         )
@@ -140,6 +140,12 @@ class Harness:
         }
 
     # --- callbacks ----------------------------------------------------------
+
+    def _on_send(self, raw: bytes) -> None:
+        self.transcript.outbound(raw)
+
+    def _on_receive(self, raw: bytes) -> None:
+        self.transcript.inbound(raw)
 
     def _on_response(self, resp: GSProResponse) -> None:
         self.last_response = resp
@@ -281,6 +287,32 @@ class Harness:
         finally:
             self.shutdown()
 
+    def run_scenario_batch(self, names: list) -> None:
+        """Runs several scenarios back-to-back over ONE connection, only
+        disconnecting at the end -- avoids the per-invocation connect/disconnect
+        churn that appears to degrade GSPro's OpenAPI connection handling (see
+        RUNBOOK.md Troubleshooting). Each scenario still gets its own
+        logs/session_<ts>/ transcript + NOTES.md, exactly like a solo run."""
+        try:
+            for i, name in enumerate(names):
+                if i > 0:
+                    self.session_dir = make_session_dir()
+                    self.transcript = Transcript(self.session_dir)
+                module = importlib.import_module(f"scenarios.{name}")
+                question = getattr(module, "QUESTION", "(no QUESTION defined)")
+                write_notes(self.session_dir, question)
+                print(f"session: {self.session_dir}")
+                print(f"scenario: {name}\nquestion: {question}")
+                module.run(self.client)
+                print(
+                    f"[harness] waiting {_SCENARIO_SHUTDOWN_GRACE_SECONDS}s for any "
+                    "trailing response..."
+                )
+                time.sleep(_SCENARIO_SHUTDOWN_GRACE_SECONDS)
+                self.transcript.close()
+        finally:
+            self.shutdown()
+
     def shutdown(self) -> None:
         self.client.disconnect()
         self.transcript.close()
@@ -293,6 +325,11 @@ def main() -> None:
     parser.add_argument("--device-id", default="GolfSimVision")
     parser.add_argument("--units", default="Yards")
     parser.add_argument("--scenario", default=None)
+    parser.add_argument(
+        "--scenarios",
+        default=None,
+        help="comma-separated scenario names, run in sequence over one connection",
+    )
     args = parser.parse_args()
 
     session_dir = make_session_dir()
@@ -304,7 +341,10 @@ def main() -> None:
         session_dir=session_dir,
     )
     try:
-        if args.scenario:
+        if args.scenarios:
+            names = [n.strip() for n in args.scenarios.split(",") if n.strip()]
+            harness.run_scenario_batch(names)
+        elif args.scenario:
             harness.run_scenario(args.scenario)
         else:
             harness.repl()

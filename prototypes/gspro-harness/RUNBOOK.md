@@ -47,10 +47,30 @@ on club changes until the client sends at least one heartbeat. Scenarios 1, 5, 6
 (the ones that only connect and wait for something to happen) now send one heartbeat
 first via `connect_and_announce()` before doing anything else, for exactly this reason.
 
+**Refined 2026-09-16 (exp10 session):** ending a round and starting a new one appears to
+reliably trigger this dead-connection state — a reset was needed after every round
+restart in this session. But it's not *only* round transitions: one dead run
+(`logs/session_20260916_185033`) happened immediately after a successful one on the same
+green, no round change in between, just a second `--scenario` invocation. Treat "reset
+needed" as something that can happen after any of: a round restart, or enough
+`--scenario` invocations — check `transcript.log` for a missing response before assuming
+a live scenario run answered anything.
+
 Run everything from `prototypes/gspro-harness/`:
 ```
 python harness.py --scenario exp01_baseline_chatter
 ```
+
+**Added 2026-09-16 (exp13 session):** to run several scenarios back-to-back over ONE
+connection instead of reconnecting per scenario -- since the per-invocation
+connect/disconnect cycle itself appears to be what degrades GSPro's connection handling,
+not any one scenario's content -- use `--scenarios` (plural) with a comma-separated list:
+```
+python harness.py --scenarios exp14_apiversion_casing,exp15_ack_correlation
+```
+Each scenario in the list still gets its own `logs/session_<ts>/` transcript + `NOTES.md`,
+exactly like a solo `--scenario` run; only the connection itself is shared. A GSPro reset
+may still be needed before the *first* scenario in a batch, same as any solo run.
 Each run creates `logs/session_<ts>/` with `transcript.log`, `transcript.jsonl`, and a
 `NOTES.md` pre-seeded with that experiment's question — fill in the answer once you've
 observed GSPro. Drop any screenshots into that same `logs/session_<ts>/` folder.

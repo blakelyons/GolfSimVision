@@ -1,0 +1,11 @@
+19:16:42.158  GSPro << {"DeviceID":"GolfSimVision","Units":"Yards","ShotNumber":1789600602,"APIversion":"1","BallData":{"Speed":0.0,"SpinAxis":0.0,"TotalSpin":0.0,"BackSpin":0.0,"SideSpin":0.0,"HLA":0.0,"VLA":0.0,"CarryDistance":0.0},"ClubData":{"Speed":0.0,"AngleOfAttack":0.0,"FaceToTarget":0.0,"Lie":0.0,"Loft":0.0,"Path":0.0,"SpeedAtImpact":0.0,"VerticalFaceImpact":0.0,"HorizontalFaceImpact":0.0,"ClosureRate":0.0},"ShotDataOptions":{"ContainsBallData":false,"ContainsClubData":false,"LaunchMonitorIsReady":true,"LaunchMonitorBallDetected":false,"IsHeartBeat":true}}
+19:16:47.159  GSPro << {"DeviceID":"GolfSimVision","Units":"Yards","ShotNumber":1789600603,"APIversion":"1","BallData":{"Speed":5.0,"SpinAxis":0.0,"TotalSpin":0.0,"HLA":0.0,"VLA":0.0},"ShotDataOptions":{"ContainsBallData":true,"ContainsClubData":false,"LaunchMonitorIsReady":true,"LaunchMonitorBallDetected":true,"IsHeartBeat":false}}
+19:16:47.518  GSPro >> {"Code":200,"Message":"Ball Data received","Player":null}
+19:16:52.083  GSPro >> {"Code":201,"Message":"GSPro Player Information","Player":{"Handed":"RH","Club":"PT","DistanceToTarget":0.0,"Surface":null}}
+19:16:52.331  GSPro >> {"Code":201,"Message":"GSPro Player Information","Player":{"Handed":"RH","Club":"PT","DistanceToTarget":12.5,"Surface":null}}
+19:16:52.579  GSPro >> {"Code":202,"Message":"GSPro ready","Player":null}
+19:16:55.768  GSPro << {"DeviceID":"GolfSimVision","Units":"Yards","ShotNumber":1789600604,"APIVersion":"1","BallData":{"Speed":5.0,"SpinAxis":0.0,"TotalSpin":0.0,"HLA":0.0,"VLA":0.0},"ShotDataOptions":{"ContainsBallData":true,"ContainsClubData":false,"LaunchMonitorIsReady":true,"LaunchMonitorBallDetected":true,"IsHeartBeat":false}}
+19:16:55.935  GSPro >> {"Code":200,"Message":"Ball Data received","Player":null}
+19:17:00.575  GSPro >> {"Code":201,"Message":"GSPro Player Information","Player":{"Handed":"RH","Club":"PT","DistanceToTarget":12.5,"Surface":null}}
+19:17:00.821  GSPro >> {"Code":201,"Message":"GSPro Player Information","Player":{"Handed":"RH","Club":"PT","DistanceToTarget":12.5,"Surface":null}}
+19:17:01.085  GSPro >> {"Code":202,"Message":"GSPro ready","Player":null}

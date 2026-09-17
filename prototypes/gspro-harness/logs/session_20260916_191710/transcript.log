@@ -1,0 +1,8 @@
+19:17:10.625  GSPro << {"DeviceID":"GolfSimVision","Units":"Yards","ShotNumber":1789600609,"APIversion":"1","BallData":{"Speed":0.0,"SpinAxis":0.0,"TotalSpin":0.0,"BackSpin":0.0,"SideSpin":0.0,"HLA":0.0,"VLA":0.0,"CarryDistance":0.0},"ClubData":{"Speed":0.0,"AngleOfAttack":0.0,"FaceToTarget":0.0,"Lie":0.0,"Loft":0.0,"Path":0.0,"SpeedAtImpact":0.0,"VerticalFaceImpact":0.0,"HorizontalFaceImpact":0.0,"ClosureRate":0.0},"ShotDataOptions":{"ContainsBallData":false,"ContainsClubData":false,"LaunchMonitorIsReady":true,"LaunchMonitorBallDetected":false,"IsHeartBeat":true}}
+19:17:13.573  GSPro >> {"Code":201,"Message":"GSPro Player Information","Player":{"Handed":"RH","Club":"PT","DistanceToTarget":12.5,"Surface":null}}
+19:17:13.821  GSPro >> {"Code":201,"Message":"GSPro Player Information","Player":{"Handed":"RH","Club":"PT","DistanceToTarget":12.5,"Surface":null}}
+19:17:14.082  GSPro >> {"Code":202,"Message":"GSPro ready","Player":null}
+19:17:15.626  GSPro << {"DeviceID":"GolfSimVision","Units":"Yards","ShotNumber":1789600610,"APIversion":"1","BallData":{"Speed":5.0},"ShotDataOptions":{"ContainsBallData":true,"ContainsClubData":false,"LaunchMonitorIsReady":true,"LaunchMonitorBallDetected":true,"IsHeartBeat":false}}
+19:17:15.627  GSPro << {"DeviceID":"GolfSimVision", not valid json}
+19:17:15.703  GSPro >> {"Code":501,"Message":"Bad format","Player":null}
+19:17:15.898  GSPro >> {"Code":200,"Message":"Ball Data received","Player":null}

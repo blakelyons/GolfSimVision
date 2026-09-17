@@ -5,6 +5,58 @@ Newest entries on top.
 
 ---
 
+## 2026-09-16 — P0-2: all 20 experiments complete, rollup docs written
+
+**What happened:** Finished the remaining experiments (08-20) against live GSPro in one
+long session, closing out P0-2 entirely. Full results are in each
+`logs/session_*/NOTES.md`; distilled into two new rollup docs:
+`docs/GSPRO_OPENCONNECT.md` (protocol facts) and `docs/GSPRO_PUTTING.md` (verified putt/
+shot payloads).
+
+**Headline findings, beyond what earlier entries already cover:**
+- **ShotNumber (exp13):** GSPro accepts any value up to int32 max (including 0, negative,
+  non-monotonic) and rejects with `501 "Bad format"` only at `>= 2^31`. No connection drop
+  either way.
+- **Reconnect (exp16):** recovers cleanly after a forced RST + reconnect; no evidence of
+  ShotNumber-continuity enforcement across the drop.
+- **Heartbeat absence (exp18):** no timeout/disconnect after 5 minutes of total silence.
+- **APIversion casing (exp14):** both `APIversion` and `APIVersion` (capital V, what
+  `gspro-r10.exe` actually sends) are accepted.
+- **ContainsBallData (exp20):** `false` wins over a populated `BallData` object — GSPro
+  silently drops the shot, no ack, no ball movement.
+- **Rapid-fire sends (exp15, exp19):** sending shots with ~0ms gaps between them produces
+  unreliable ack counts and no way to correlate a response to a specific request —
+  flagged as a real production concern (pace shots, don't fire back-to-back with no gap),
+  not just a Phase-0 curiosity.
+- **HLA sign (exp11):** only provisional — ran on a green with some slope, so the
+  left/right read could be slope, not the `HLA` value. Accepted as-is per Blake's call;
+  documented as provisional rather than re-tested on flat ground.
+- **exp09 (VLA sweep) and exp10 (TotalSpin) visual comparisons:** inconclusive/weak —
+  differences were hard to see reliably from a single pass of manual observation.
+
+**Operational finding, significant for anyone running this harness again:** the
+per-invocation connect/disconnect churn (one full cycle per `--scenario` process launch)
+reliably degrades GSPro's OpenAPI connection handling badly enough that a live
+Settings > Game > Reset GSPro Connect was needed **before nearly every single
+experiment** in this session — sometimes more than once per experiment when a round was
+also restarted. Added `--scenarios name1,name2,...` to `harness.py` (runs several
+scenarios back-to-back over one connection instead of reconnecting per scenario) — this
+measurably helped (once reset, up to 4 chained scenarios ran clean with no further
+resets) but didn't eliminate the need for an initial reset once GSPro's state had already
+degraded from earlier separate invocations. **This is judged to be a Phase-0-harness-only
+artifact** (one connect/disconnect cycle per CLI invocation, dozens of times a session) —
+the production app holds one persistent connection for a whole round and should never
+hit this pattern. Documented in `RUNBOOK.md`'s Troubleshooting section.
+
+Exit criteria (per `README.md`): all met except HLA sign, which is accepted as
+provisional per Blake's explicit call rather than re-tested on flat ground. Suite
+unaffected, still 38/38.
+
+**Not yet done:** commit `logs/`, the two new docs, and the `harness.py`/`RUNBOOK.md`
+changes from this session to `main`.
+
+---
+
 ## 2026-09-16 — P0-2: exp07 done, real root cause of dropped shots found (not a delay tuning problem)
 
 **What happened:** Switched all 13 remaining scenarios (07-16, 18-20) from
