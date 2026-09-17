@@ -1,0 +1,70 @@
+11:41:11.959  Garmin >> {"Type":"Handshake"}
+11:41:11.959  Garmin << {"Type":"Handshake","Challenge":"GolfSimVisionE6ChallengeXK9mQ2vN8pR4wL6j","E6Version":"2, 0, 0, 0","ProtocolVersion":"1.0.0.5","RequiredProtocolVersion":"1.0.0.0"}
+11:41:11.964  Garmin >> {"Type":"Challenge","Hash":"dcbaa42ad185dd4453bb219811ecd388098d00b7f040fe91123329340b08ef3d","Developer":"3AC71B6A-5C98-4328-A026-E9017028B130"}
+11:41:11.965  Garmin << {"Type":"Authentication","Success":"true"}
+11:41:11.972  Garmin >> {"Type":"Disconnect"}
+11:41:15.794  Garmin >> {"Type":"Handshake"}
+11:41:15.794  Garmin << {"Type":"Handshake","Challenge":"GolfSimVisionE6ChallengeXK9mQ2vN8pR4wL6j","E6Version":"2, 0, 0, 0","ProtocolVersion":"1.0.0.5","RequiredProtocolVersion":"1.0.0.0"}
+11:41:15.803  Garmin >> {"Developer":"3AC71B6A-5C98-4328-A026-E9017028B130","Type":"Challenge","Hash":"dcbaa42ad185dd4453bb219811ecd388098d00b7f040fe91123329340b08ef3d"}
+11:41:15.803  Garmin << {"Type":"Authentication","Success":"true"}
+11:41:17.128  Garmin >> {"Type":"Handshake"}
+11:41:17.128  Garmin << {"Type":"Handshake","Challenge":"GolfSimVisionE6ChallengeXK9mQ2vN8pR4wL6j","E6Version":"2, 0, 0, 0","ProtocolVersion":"1.0.0.5","RequiredProtocolVersion":"1.0.0.0"}
+11:41:17.138  Garmin >> {"Developer":"3AC71B6A-5C98-4328-A026-E9017028B130","Type":"Challenge","Hash":"dcbaa42ad185dd4453bb219811ecd388098d00b7f040fe91123329340b08ef3d"}
+11:41:17.138  Garmin << {"Type":"Authentication","Success":"true"}
+11:41:27.130  Garmin << {"Type":"SimCommand","SubType":"Ping"}
+11:41:27.156  Garmin >> {"Type":"Pong"}
+11:41:37.132  Garmin << {"Type":"SimCommand","SubType":"Ping"}
+11:41:37.193  Garmin >> {"Type":"Pong"}
+11:41:47.134  Garmin << {"Type":"SimCommand","SubType":"Ping"}
+11:41:47.230  Garmin >> {"Type":"Pong"}
+11:41:57.136  Garmin << {"Type":"SimCommand","SubType":"Ping"}
+11:41:57.141  Garmin >> {"Type":"Pong"}
+11:42:07.138  Garmin << {"Type":"SimCommand","SubType":"Ping"}
+11:42:07.237  Garmin >> {"Type":"Pong"}
+11:42:10.818  Garmin >> {"ClubType":"7Iron","Type":"SetClubType"}
+11:42:10.818  Garmin << {"Type":"ACK","SubType":"SetClubType","Details":"Success."}
+11:42:17.140  Garmin << {"Type":"SimCommand","SubType":"Ping"}
+11:42:17.179  Garmin >> {"Type":"Pong"}
+11:42:27.142  Garmin << {"Type":"SimCommand","SubType":"Ping"}
+11:42:27.207  Garmin >> {"Type":"Pong"}
+11:42:30.361  Garmin >> {"Type":"Disconnect"}
+11:42:30.376  Garmin >> {"Type":"Handshake"}
+11:42:30.376  Garmin << {"Type":"Handshake","Challenge":"GolfSimVisionE6ChallengeXK9mQ2vN8pR4wL6j","E6Version":"2, 0, 0, 0","ProtocolVersion":"1.0.0.5","RequiredProtocolVersion":"1.0.0.0"}
+11:42:30.384  Garmin >> {"Type":"Challenge","Hash":"dcbaa42ad185dd4453bb219811ecd388098d00b7f040fe91123329340b08ef3d","Developer":"3AC71B6A-5C98-4328-A026-E9017028B130"}
+11:42:30.384  Garmin << {"Type":"Authentication","Success":"true"}
+11:42:34.719  Garmin >> {"Type":"Disconnect"}
+11:42:34.730  Garmin >> {"Type":"Handshake"}
+11:42:34.730  Garmin << {"Type":"Handshake","Challenge":"GolfSimVisionE6ChallengeXK9mQ2vN8pR4wL6j","E6Version":"2, 0, 0, 0","ProtocolVersion":"1.0.0.5","RequiredProtocolVersion":"1.0.0.0"}
+11:42:34.740  Garmin >> {"Type":"Challenge","Developer":"3AC71B6A-5C98-4328-A026-E9017028B130","Hash":"dcbaa42ad185dd4453bb219811ecd388098d00b7f040fe91123329340b08ef3d"}
+11:42:34.740  Garmin << {"Type":"Authentication","Success":"true"}
+11:42:40.608  Garmin >> {"Type":"SetBallData","BallData":{"LaunchAngle":7.660278,"LaunchDirection":0.9948431,"SpinAxis":0.5823993,"TotalSpin":3934.5596,"BallSpeed":90.114365}}
+11:42:40.608  Garmin << {"Type":"ACK","SubType":"SetBallData","Details":"Success."}
+11:42:40.617  Garmin >> {"ClubData":{"ClubAngleFace":0.9910353422164917,"ClubHeadSpeed":64.98853991350789,"ClubAnglePath":1.4448057413101196},"Type":"SetClubData"}
+11:42:40.617  Garmin << {"Type":"ACK","SubType":"SetClubData","Details":"Success."}
+11:42:40.626  Garmin >> {"Type":"SendShot"}
+11:42:40.626  Garmin << {"Type":"ACK","SubType":"SendShot","Details":"Success."}
+11:42:44.732  Garmin << {"Type":"SimCommand","SubType":"Ping"}
+11:42:44.740  Garmin >> {"Type":"Pong"}
+11:42:45.749  Garmin >> {"Type":"Disconnect"}
+11:42:45.761  Garmin >> {"Type":"Handshake"}
+11:42:45.762  Garmin << {"Type":"Handshake","Challenge":"GolfSimVisionE6ChallengeXK9mQ2vN8pR4wL6j","E6Version":"2, 0, 0, 0","ProtocolVersion":"1.0.0.5","RequiredProtocolVersion":"1.0.0.0"}
+11:42:45.773  Garmin >> {"Developer":"3AC71B6A-5C98-4328-A026-E9017028B130","Type":"Challenge","Hash":"dcbaa42ad185dd4453bb219811ecd388098d00b7f040fe91123329340b08ef3d"}
+11:42:45.773  Garmin << {"Type":"Authentication","Success":"true"}
+11:42:46.918  Garmin >> {"Type":"Disconnect"}
+11:42:46.931  Garmin >> {"Type":"Handshake"}
+11:42:46.931  Garmin << {"Type":"Handshake","Challenge":"GolfSimVisionE6ChallengeXK9mQ2vN8pR4wL6j","E6Version":"2, 0, 0, 0","ProtocolVersion":"1.0.0.5","RequiredProtocolVersion":"1.0.0.0"}
+11:42:46.939  Garmin >> {"Type":"Challenge","Hash":"dcbaa42ad185dd4453bb219811ecd388098d00b7f040fe91123329340b08ef3d","Developer":"3AC71B6A-5C98-4328-A026-E9017028B130"}
+11:42:46.939  Garmin << {"Type":"Authentication","Success":"true"}
+11:42:53.669  Garmin >> {"Type":"Disconnect"}
+11:42:53.676  Garmin >> {"Type":"Disconnect"}
+11:42:56.933  Garmin << {"Type":"SimCommand","SubType":"Ping"}
+11:43:06.935  Garmin << {"Type":"SimCommand","SubType":"Ping"}
+11:43:16.937  Garmin << {"Type":"SimCommand","SubType":"Ping"}
+11:43:26.939  Garmin << {"Type":"SimCommand","SubType":"Ping"}
+11:43:36.940  Garmin << {"Type":"SimCommand","SubType":"Ping"}
+11:43:46.943  Garmin << {"Type":"SimCommand","SubType":"Ping"}
+11:43:56.944  Garmin << {"Type":"SimCommand","SubType":"Ping"}
+11:44:06.946  Garmin << {"Type":"SimCommand","SubType":"Ping"}
+11:44:16.948  Garmin << {"Type":"SimCommand","SubType":"Ping"}
+11:44:26.950  Garmin << {"Type":"SimCommand","SubType":"Ping"}
+11:44:36.952  Garmin << {"Type":"SimCommand","SubType":"Ping"}

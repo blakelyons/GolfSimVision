@@ -1,0 +1,70 @@
+{"ts": 1789659671.9596078, "direction": ">>", "raw": "{\"Type\":\"Handshake\"}"}
+{"ts": 1789659671.9598708, "direction": "<<", "raw": "{\"Type\":\"Handshake\",\"Challenge\":\"GolfSimVisionE6ChallengeXK9mQ2vN8pR4wL6j\",\"E6Version\":\"2, 0, 0, 0\",\"ProtocolVersion\":\"1.0.0.5\",\"RequiredProtocolVersion\":\"1.0.0.0\"}"}
+{"ts": 1789659671.9648304, "direction": ">>", "raw": "{\"Type\":\"Challenge\",\"Hash\":\"dcbaa42ad185dd4453bb219811ecd388098d00b7f040fe91123329340b08ef3d\",\"Developer\":\"3AC71B6A-5C98-4328-A026-E9017028B130\"}"}
+{"ts": 1789659671.96501, "direction": "<<", "raw": "{\"Type\":\"Authentication\",\"Success\":\"true\"}"}
+{"ts": 1789659671.9721155, "direction": ">>", "raw": "{\"Type\":\"Disconnect\"}"}
+{"ts": 1789659675.7942317, "direction": ">>", "raw": "{\"Type\":\"Handshake\"}"}
+{"ts": 1789659675.794445, "direction": "<<", "raw": "{\"Type\":\"Handshake\",\"Challenge\":\"GolfSimVisionE6ChallengeXK9mQ2vN8pR4wL6j\",\"E6Version\":\"2, 0, 0, 0\",\"ProtocolVersion\":\"1.0.0.5\",\"RequiredProtocolVersion\":\"1.0.0.0\"}"}
+{"ts": 1789659675.8036015, "direction": ">>", "raw": "{\"Developer\":\"3AC71B6A-5C98-4328-A026-E9017028B130\",\"Type\":\"Challenge\",\"Hash\":\"dcbaa42ad185dd4453bb219811ecd388098d00b7f040fe91123329340b08ef3d\"}"}
+{"ts": 1789659675.803765, "direction": "<<", "raw": "{\"Type\":\"Authentication\",\"Success\":\"true\"}"}
+{"ts": 1789659677.1284223, "direction": ">>", "raw": "{\"Type\":\"Handshake\"}"}
+{"ts": 1789659677.128656, "direction": "<<", "raw": "{\"Type\":\"Handshake\",\"Challenge\":\"GolfSimVisionE6ChallengeXK9mQ2vN8pR4wL6j\",\"E6Version\":\"2, 0, 0, 0\",\"ProtocolVersion\":\"1.0.0.5\",\"RequiredProtocolVersion\":\"1.0.0.0\"}"}
+{"ts": 1789659677.1380405, "direction": ">>", "raw": "{\"Developer\":\"3AC71B6A-5C98-4328-A026-E9017028B130\",\"Type\":\"Challenge\",\"Hash\":\"dcbaa42ad185dd4453bb219811ecd388098d00b7f040fe91123329340b08ef3d\"}"}
+{"ts": 1789659677.1381943, "direction": "<<", "raw": "{\"Type\":\"Authentication\",\"Success\":\"true\"}"}
+{"ts": 1789659687.1305714, "direction": "<<", "raw": "{\"Type\":\"SimCommand\",\"SubType\":\"Ping\"}"}
+{"ts": 1789659687.1568723, "direction": ">>", "raw": "{\"Type\":\"Pong\"}"}
+{"ts": 1789659697.1326206, "direction": "<<", "raw": "{\"Type\":\"SimCommand\",\"SubType\":\"Ping\"}"}
+{"ts": 1789659697.193533, "direction": ">>", "raw": "{\"Type\":\"Pong\"}"}
+{"ts": 1789659707.134781, "direction": "<<", "raw": "{\"Type\":\"SimCommand\",\"SubType\":\"Ping\"}"}
+{"ts": 1789659707.2302547, "direction": ">>", "raw": "{\"Type\":\"Pong\"}"}
+{"ts": 1789659717.136685, "direction": "<<", "raw": "{\"Type\":\"SimCommand\",\"SubType\":\"Ping\"}"}
+{"ts": 1789659717.141971, "direction": ">>", "raw": "{\"Type\":\"Pong\"}"}
+{"ts": 1789659727.1385305, "direction": "<<", "raw": "{\"Type\":\"SimCommand\",\"SubType\":\"Ping\"}"}
+{"ts": 1789659727.2370217, "direction": ">>", "raw": "{\"Type\":\"Pong\"}"}
+{"ts": 1789659730.818728, "direction": ">>", "raw": "{\"ClubType\":\"7Iron\",\"Type\":\"SetClubType\"}"}
+{"ts": 1789659730.8189144, "direction": "<<", "raw": "{\"Type\":\"ACK\",\"SubType\":\"SetClubType\",\"Details\":\"Success.\"}"}
+{"ts": 1789659737.1403682, "direction": "<<", "raw": "{\"Type\":\"SimCommand\",\"SubType\":\"Ping\"}"}
+{"ts": 1789659737.1792514, "direction": ">>", "raw": "{\"Type\":\"Pong\"}"}
+{"ts": 1789659747.142126, "direction": "<<", "raw": "{\"Type\":\"SimCommand\",\"SubType\":\"Ping\"}"}
+{"ts": 1789659747.2077246, "direction": ">>", "raw": "{\"Type\":\"Pong\"}"}
+{"ts": 1789659750.3611197, "direction": ">>", "raw": "{\"Type\":\"Disconnect\"}"}
+{"ts": 1789659750.3765137, "direction": ">>", "raw": "{\"Type\":\"Handshake\"}"}
+{"ts": 1789659750.3768034, "direction": "<<", "raw": "{\"Type\":\"Handshake\",\"Challenge\":\"GolfSimVisionE6ChallengeXK9mQ2vN8pR4wL6j\",\"E6Version\":\"2, 0, 0, 0\",\"ProtocolVersion\":\"1.0.0.5\",\"RequiredProtocolVersion\":\"1.0.0.0\"}"}
+{"ts": 1789659750.384235, "direction": ">>", "raw": "{\"Type\":\"Challenge\",\"Hash\":\"dcbaa42ad185dd4453bb219811ecd388098d00b7f040fe91123329340b08ef3d\",\"Developer\":\"3AC71B6A-5C98-4328-A026-E9017028B130\"}"}
+{"ts": 1789659750.3844888, "direction": "<<", "raw": "{\"Type\":\"Authentication\",\"Success\":\"true\"}"}
+{"ts": 1789659754.719864, "direction": ">>", "raw": "{\"Type\":\"Disconnect\"}"}
+{"ts": 1789659754.7303817, "direction": ">>", "raw": "{\"Type\":\"Handshake\"}"}
+{"ts": 1789659754.7305439, "direction": "<<", "raw": "{\"Type\":\"Handshake\",\"Challenge\":\"GolfSimVisionE6ChallengeXK9mQ2vN8pR4wL6j\",\"E6Version\":\"2, 0, 0, 0\",\"ProtocolVersion\":\"1.0.0.5\",\"RequiredProtocolVersion\":\"1.0.0.0\"}"}
+{"ts": 1789659754.7401497, "direction": ">>", "raw": "{\"Type\":\"Challenge\",\"Developer\":\"3AC71B6A-5C98-4328-A026-E9017028B130\",\"Hash\":\"dcbaa42ad185dd4453bb219811ecd388098d00b7f040fe91123329340b08ef3d\"}"}
+{"ts": 1789659754.7403777, "direction": "<<", "raw": "{\"Type\":\"Authentication\",\"Success\":\"true\"}"}
+{"ts": 1789659760.6083014, "direction": ">>", "raw": "{\"Type\":\"SetBallData\",\"BallData\":{\"LaunchAngle\":7.660278,\"LaunchDirection\":0.9948431,\"SpinAxis\":0.5823993,\"TotalSpin\":3934.5596,\"BallSpeed\":90.114365}}"}
+{"ts": 1789659760.608505, "direction": "<<", "raw": "{\"Type\":\"ACK\",\"SubType\":\"SetBallData\",\"Details\":\"Success.\"}"}
+{"ts": 1789659760.6170766, "direction": ">>", "raw": "{\"ClubData\":{\"ClubAngleFace\":0.9910353422164917,\"ClubHeadSpeed\":64.98853991350789,\"ClubAnglePath\":1.4448057413101196},\"Type\":\"SetClubData\"}"}
+{"ts": 1789659760.617265, "direction": "<<", "raw": "{\"Type\":\"ACK\",\"SubType\":\"SetClubData\",\"Details\":\"Success.\"}"}
+{"ts": 1789659760.6260934, "direction": ">>", "raw": "{\"Type\":\"SendShot\"}"}
+{"ts": 1789659760.6263382, "direction": "<<", "raw": "{\"Type\":\"ACK\",\"SubType\":\"SendShot\",\"Details\":\"Success.\"}"}
+{"ts": 1789659764.732046, "direction": "<<", "raw": "{\"Type\":\"SimCommand\",\"SubType\":\"Ping\"}"}
+{"ts": 1789659764.7400987, "direction": ">>", "raw": "{\"Type\":\"Pong\"}"}
+{"ts": 1789659765.7497468, "direction": ">>", "raw": "{\"Type\":\"Disconnect\"}"}
+{"ts": 1789659765.761987, "direction": ">>", "raw": "{\"Type\":\"Handshake\"}"}
+{"ts": 1789659765.7621372, "direction": "<<", "raw": "{\"Type\":\"Handshake\",\"Challenge\":\"GolfSimVisionE6ChallengeXK9mQ2vN8pR4wL6j\",\"E6Version\":\"2, 0, 0, 0\",\"ProtocolVersion\":\"1.0.0.5\",\"RequiredProtocolVersion\":\"1.0.0.0\"}"}
+{"ts": 1789659765.7736857, "direction": ">>", "raw": "{\"Developer\":\"3AC71B6A-5C98-4328-A026-E9017028B130\",\"Type\":\"Challenge\",\"Hash\":\"dcbaa42ad185dd4453bb219811ecd388098d00b7f040fe91123329340b08ef3d\"}"}
+{"ts": 1789659765.773849, "direction": "<<", "raw": "{\"Type\":\"Authentication\",\"Success\":\"true\"}"}
+{"ts": 1789659766.9183197, "direction": ">>", "raw": "{\"Type\":\"Disconnect\"}"}
+{"ts": 1789659766.9314187, "direction": ">>", "raw": "{\"Type\":\"Handshake\"}"}
+{"ts": 1789659766.931569, "direction": "<<", "raw": "{\"Type\":\"Handshake\",\"Challenge\":\"GolfSimVisionE6ChallengeXK9mQ2vN8pR4wL6j\",\"E6Version\":\"2, 0, 0, 0\",\"ProtocolVersion\":\"1.0.0.5\",\"RequiredProtocolVersion\":\"1.0.0.0\"}"}
+{"ts": 1789659766.9391441, "direction": ">>", "raw": "{\"Type\":\"Challenge\",\"Hash\":\"dcbaa42ad185dd4453bb219811ecd388098d00b7f040fe91123329340b08ef3d\",\"Developer\":\"3AC71B6A-5C98-4328-A026-E9017028B130\"}"}
+{"ts": 1789659766.9393566, "direction": "<<", "raw": "{\"Type\":\"Authentication\",\"Success\":\"true\"}"}
+{"ts": 1789659773.669329, "direction": ">>", "raw": "{\"Type\":\"Disconnect\"}"}
+{"ts": 1789659773.6765523, "direction": ">>", "raw": "{\"Type\":\"Disconnect\"}"}
+{"ts": 1789659776.9333847, "direction": "<<", "raw": "{\"Type\":\"SimCommand\",\"SubType\":\"Ping\"}"}
+{"ts": 1789659786.9352345, "direction": "<<", "raw": "{\"Type\":\"SimCommand\",\"SubType\":\"Ping\"}"}
+{"ts": 1789659796.9372063, "direction": "<<", "raw": "{\"Type\":\"SimCommand\",\"SubType\":\"Ping\"}"}
+{"ts": 1789659806.939139, "direction": "<<", "raw": "{\"Type\":\"SimCommand\",\"SubType\":\"Ping\"}"}
+{"ts": 1789659816.940989, "direction": "<<", "raw": "{\"Type\":\"SimCommand\",\"SubType\":\"Ping\"}"}
+{"ts": 1789659826.9430552, "direction": "<<", "raw": "{\"Type\":\"SimCommand\",\"SubType\":\"Ping\"}"}
+{"ts": 1789659836.9448402, "direction": "<<", "raw": "{\"Type\":\"SimCommand\",\"SubType\":\"Ping\"}"}
+{"ts": 1789659846.9467418, "direction": "<<", "raw": "{\"Type\":\"SimCommand\",\"SubType\":\"Ping\"}"}
+{"ts": 1789659856.9486392, "direction": "<<", "raw": "{\"Type\":\"SimCommand\",\"SubType\":\"Ping\"}"}
+{"ts": 1789659866.9506085, "direction": "<<", "raw": "{\"Type\":\"SimCommand\",\"SubType\":\"Ping\"}"}
+{"ts": 1789659876.952628, "direction": "<<", "raw": "{\"Type\":\"SimCommand\",\"SubType\":\"Ping\"}"}
