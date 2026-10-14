@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Text.Json;
+using System.Threading.Tasks;
 using System.Windows;
 using GolfSimVision.Settings;
 using GolfSimVision.Simulator;
@@ -80,18 +81,28 @@ public partial class MainWindow : Window
             PostStatus(lastError: "Not connected to GSPro");
             return;
         }
-        try
+
+        // Send() can block the calling thread for up to MinShotInterval (the pacing
+        // guard) -- run it off the UI dispatcher thread so a rapid double-click never
+        // freezes the window. Captured locally since this runs after OnWebMessageReceived
+        // returns, by which point _connector/_codec could theoretically be reassigned.
+        var connector = _connector;
+        var codec = _codec;
+        Task.Run(() =>
         {
-            // A manual, developer-facing test shot -- not a real measurement. Values
-            // match GSPRO_PUTTING.md's verified working putt payload (exp 8).
-            var payload = _codec.BuildPutt(speed: 5.0, hla: 0.0, vla: 0.0);
-            _connector.Send(payload);
-            PostStatus();
-        }
-        catch (Exception ex)
-        {
-            PostStatus(lastError: ex.Message);
-        }
+            try
+            {
+                // A manual, developer-facing test shot -- not a real measurement. Values
+                // match GSPRO_PUTTING.md's verified working putt payload (exp 8).
+                var payload = codec.BuildPutt(speed: 5.0, hla: 0.0, vla: 0.0);
+                connector.Send(payload);
+                Dispatcher.Invoke(() => PostStatus());
+            }
+            catch (Exception ex)
+            {
+                Dispatcher.Invoke(() => PostStatus(lastError: ex.Message));
+            }
+        });
     }
 
     private void PostStatus(GsProResponse? response = null, string? lastError = null)

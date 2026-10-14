@@ -177,6 +177,41 @@ public class SimulatorConnectorTests : IDisposable
     }
 
     [Fact]
+    public void RecvLoopResyncsAfterOver64KbWithNoCompleteFrame()
+    {
+        // FindJsonEnd() itself is covered directly in FindJsonEndTests; this exercises
+        // the caller's side of the same case, mirroring test_protocol.py's
+        // test_recv_loop_resyncs_after_over_64kb_with_no_complete_frame -- feed the real
+        // RecvLoop more than MaxFrameBytes of an unterminated frame and confirm it clears
+        // the buffer and keeps parsing, rather than getting stuck or crashing.
+        var received = new ManualResetEventSlim(false);
+        var responses = new List<GsProResponse>();
+        _client.OnResponse = r => { responses.Add(r); received.Set(); };
+
+        _client.Connect();
+        WaitUntil.True(() => _client.State == ConnectionState.Connected);
+
+        var prefix = Encoding.UTF8.GetBytes("{\"a\":\"");
+        var filler = new byte[JsonFraming.MaxFrameBytes + 1];
+        Array.Fill(filler, (byte)'x');
+        var oversized = new byte[prefix.Length + filler.Length];
+        prefix.CopyTo(oversized, 0);
+        filler.CopyTo(oversized, prefix.Length);
+        _server.SendToClient(oversized);
+
+        // Give the recv loop a moment to drain and clear the oversized buffer before the
+        // valid frame arrives -- otherwise both could land in the same read and the clear
+        // would wipe the valid frame out too.
+        Thread.Sleep(300);
+        _server.SendToClient(Encoding.UTF8.GetBytes("{\"Code\":200,\"Message\":\"OK\"}"));
+
+        Assert.True(received.Wait(TimeSpan.FromSeconds(2)));
+        Assert.Single(responses);
+        Assert.Equal(200, responses[0].Code);
+        Assert.Equal("OK", responses[0].Message);
+    }
+
+    [Fact]
     public void ShotsArePacedWithAMinimumInterval()
     {
         _client.Connect();

@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.Text.Json;
+
 namespace GolfSimVision.Simulator;
 
 /// <summary>
@@ -78,4 +81,4 @@ public sealed record ShotPayload
 /// 203 "GSPro round ended" (benign, unexplained), 501 "Bad format". GSPro gives no
 /// field correlating a response to a specific request.
 /// </summary>
-public sealed record GsProResponse(int Code, string Message = "", System.Text.Json.Nodes.JsonObject? Player = null);
+public sealed record GsProResponse(int Code, string Message = "", IReadOnlyDictionary<string, JsonElement>? Player = null);

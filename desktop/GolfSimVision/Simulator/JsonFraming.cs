@@ -1,6 +1,6 @@
 using System;
+using System.Collections.Generic;
 using System.Text.Json;
-using System.Text.Json.Nodes;
 
 namespace GolfSimVision.Simulator;
 
@@ -27,30 +27,41 @@ public static class JsonFraming
     /// <summary>Parses a GSPro reply. Throws FormatException on malformed JSON.</summary>
     public static GsProResponse ParseResponse(byte[] raw)
     {
-        JsonNode? node;
+        JsonDocument doc;
         try
         {
-            node = JsonNode.Parse(raw);
+            doc = JsonDocument.Parse(raw);
         }
         catch (JsonException ex)
         {
             throw new FormatException($"Malformed GSPro response: {ex.Message}", ex);
         }
 
-        if (node is not JsonObject obj)
-            throw new FormatException("Malformed GSPro response: not a JSON object");
+        using (doc)
+        {
+            var root = doc.RootElement;
+            if (root.ValueKind != JsonValueKind.Object)
+                throw new FormatException("Malformed GSPro response: not a JSON object");
 
-        var code = obj.TryGetPropertyValue("Code", out var codeNode) && codeNode is not null
-            ? codeNode.GetValue<int>()
-            : 0;
-        var message = obj.TryGetPropertyValue("Message", out var msgNode) && msgNode is not null
-            ? msgNode.GetValue<string>()
-            : "";
-        JsonObject? player = obj.TryGetPropertyValue("Player", out var playerNode)
-            ? playerNode as JsonObject
-            : null;
+            var code = root.TryGetProperty("Code", out var codeEl) ? codeEl.GetInt32() : 0;
+            var message = root.TryGetProperty("Message", out var msgEl) ? msgEl.GetString() ?? "" : "";
 
-        return new GsProResponse(code, message, player);
+            // Player's real shape isn't fully known (GSPRO_OPENCONNECT.md only confirms a
+            // "Handed" field) -- a typed dictionary of cloned JsonElements avoids both an
+            // untyped mutable JSON DOM node and inventing an unverified full schema.
+            IReadOnlyDictionary<string, JsonElement>? player = null;
+            if (root.TryGetProperty("Player", out var playerEl) && playerEl.ValueKind == JsonValueKind.Object)
+            {
+                var dict = new Dictionary<string, JsonElement>();
+                foreach (var prop in playerEl.EnumerateObject())
+                {
+                    dict[prop.Name] = prop.Value.Clone();
+                }
+                player = dict;
+            }
+
+            return new GsProResponse(code, message, player);
+        }
     }
 
     /// <summary>

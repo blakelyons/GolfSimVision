@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.Net.Sockets;
 using System.Threading;
@@ -25,7 +26,11 @@ namespace GolfSimVision.Simulator;
 /// </summary>
 public sealed class SimulatorConnector : IDisposable
 {
-    public static readonly double[] DefaultBackoffSeconds = { 1.0, 2.0, 4.0, 8.0, 16.0, 30.0 };
+    // ImmutableArray, not a plain array: a plain `static readonly double[]` only pins the
+    // reference -- its elements would still be mutable and shared by every instance that
+    // doesn't pass its own backoffSeconds (ADR-0006: no shared mutable state).
+    public static readonly ImmutableArray<double> DefaultBackoffSeconds =
+        ImmutableArray.Create(1.0, 2.0, 4.0, 8.0, 16.0, 30.0);
 
     /// Not a Phase-0 finding with a specific "right" value -- a conservative guard
     /// against the exp15/19 rapid-fire problem, chosen to be well under any pace a human
@@ -37,7 +42,7 @@ public sealed class SimulatorConnector : IDisposable
 
     private readonly string _host;
     private readonly int _port;
-    private readonly double[] _backoffSeconds;
+    private readonly IReadOnlyList<double> _backoffSeconds;
 
     private readonly object _stateLock = new();
     private ConnectionState _state = ConnectionState.Disabled;
@@ -70,7 +75,7 @@ public sealed class SimulatorConnector : IDisposable
         int port,
         string deviceId,
         string units = "Yards",
-        double[]? backoffSeconds = null)
+        IReadOnlyList<double>? backoffSeconds = null)
     {
         _host = host;
         _port = port;
@@ -134,6 +139,9 @@ public sealed class SimulatorConnector : IDisposable
     public void Connect()
     {
         if (_connectionThread is { IsAlive: true }) return;
+        // Disposes any CancellationTokenSource from a previous Connect()/Disconnect()
+        // cycle on this instance -- otherwise only the final one ever gets disposed.
+        _stopCts?.Dispose();
         _stopCts = new CancellationTokenSource();
         var token = _stopCts.Token;
         _connectionThread = new Thread(() => ConnectionLoop(token))
@@ -277,7 +285,7 @@ public sealed class SimulatorConnector : IDisposable
 
     private double BackoffForAttempt(int attempt)
     {
-        var idx = Math.Min(attempt, _backoffSeconds.Length - 1);
+        var idx = Math.Min(attempt, _backoffSeconds.Count - 1);
         return _backoffSeconds[idx];
     }
 

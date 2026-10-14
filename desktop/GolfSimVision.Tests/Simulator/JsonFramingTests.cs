@@ -65,7 +65,7 @@ public class ParseResponseTests
         Assert.Equal(200, resp.Code);
         Assert.Equal("OK", resp.Message);
         Assert.NotNull(resp.Player);
-        Assert.Equal("RH", resp.Player!["Handed"]!.GetValue<string>());
+        Assert.Equal("RH", resp.Player!["Handed"].GetString());
     }
 
     [Fact]
