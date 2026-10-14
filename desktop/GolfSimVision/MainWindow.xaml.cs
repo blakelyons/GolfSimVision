@@ -3,6 +3,7 @@ using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
+using GolfSimVision.Capture;
 using GolfSimVision.Settings;
 using GolfSimVision.Simulator;
 using GolfSimVision.UiMessages;
@@ -11,10 +12,9 @@ using Microsoft.Web.WebView2.Core;
 namespace GolfSimVision;
 
 /// <summary>
-/// The app shell: hosts the WebView2 UI, owns the one SimulatorConnector, and is the
-/// only place that translates between the UI's typed messages and the backend's typed
-/// domain objects. Ticket #2's whole job is proving this path end to end with a manual
-/// test-shot button -- no camera, no R10, no detection yet.
+/// The app shell: hosts the WebView2 UI, owns the one SimulatorConnector and the one
+/// UsbWebcam/BufferedCaptureSession, and is the only place that translates between the
+/// UI's typed messages and the backend's typed domain objects.
 /// </summary>
 public partial class MainWindow : Window
 {
@@ -25,8 +25,15 @@ public partial class MainWindow : Window
 
     private readonly SettingsStore _settingsStore = new();
     private readonly AppSettings _settings;
+
     private SimulatorConnector? _connector;
     private GsProCodec? _codec;
+
+    private IFrameSource? _webcam;
+    private BufferedCaptureSession? _captureSession;
+    private CaptureHealth? _lastHealth;
+    private string? _cameraError;
+    private int? _lastStrokeFrameCount;
 
     public MainWindow()
     {
@@ -51,6 +58,50 @@ public partial class MainWindow : Window
         _connector.OnStatus = _ => Dispatcher.Invoke(() => PostStatus());
         _connector.OnResponse = response => Dispatcher.Invoke(() => PostStatus(response));
         _connector.Connect();
+
+        await OpenCameraAsync();
+        PostStatus();
+    }
+
+    private async Task OpenCameraAsync()
+    {
+        _captureSession = new BufferedCaptureSession(_settings.RingBufferCapacity);
+        _captureSession.OnRingBufferStateChanged = _ => Dispatcher.Invoke(() => PostStatus());
+        _captureSession.OnWindowShipped = window => Dispatcher.Invoke(() =>
+        {
+            _lastStrokeFrameCount = window.Count;
+            PostStatus();
+        });
+
+        var webcam = new UsbWebcam();
+        webcam.OnLog = msg => Console.WriteLine($"[capture] {msg}");
+        webcam.OnFrame = frame => _captureSession?.Ingest(frame);
+        webcam.OnPreviewFrame = jpeg => Dispatcher.Invoke(() => PostPreviewFrame(jpeg));
+        webcam.OnHealth = health => Dispatcher.Invoke(() =>
+        {
+            _lastHealth = health;
+            PostStatus();
+        });
+        _webcam = webcam;
+
+        var request = new CameraOpenRequest(
+            _settings.CameraIndex, _settings.CameraWidth, _settings.CameraHeight, _settings.CameraFps,
+            _settings.CameraExposure, _settings.CameraGain);
+
+        // Each open-time property set can take up to ~15s on known hardware -- run off
+        // the UI thread so the window never appears frozen while the camera negotiates.
+        var result = await Task.Run(() => webcam.Open(request));
+
+        if (!result.Success)
+        {
+            _cameraError = result.FailureReason;
+            return;
+        }
+
+        _cameraError = null;
+        // Default to Putting mode so the manual stroke-trigger demo works without the
+        // user first having to flip modes -- GolfSimVision's primary scenario.
+        _captureSession.SetMode(CaptureMode.Putting);
     }
 
     private void OnWebMessageReceived(object? sender, CoreWebView2WebMessageReceivedEventArgs e)
@@ -71,7 +122,34 @@ public partial class MainWindow : Window
             case "sendTestShot":
                 SendTestShot();
                 break;
+            case "setCaptureMode":
+                SetCaptureMode(request.Mode);
+                break;
+            case "triggerTestStroke":
+                _captureSession?.TriggerStroke();
+                PostStatus();
+                break;
+            case "endTestStroke":
+                _captureSession?.EndStroke();
+                break;
         }
+    }
+
+    private void SetCaptureMode(string? mode)
+    {
+        if (_captureSession is null) return;
+        switch (mode)
+        {
+            case "fullShot":
+                _captureSession.SetMode(CaptureMode.FullShot);
+                break;
+            case "putting":
+                _captureSession.SetMode(CaptureMode.Putting);
+                break;
+            default:
+                return;
+        }
+        PostStatus();
     }
 
     private void SendTestShot()
@@ -112,14 +190,34 @@ public partial class MainWindow : Window
             IsReadyForNextShot: _connector?.IsReadyForNextShot ?? false,
             LastResponseCode: response?.Code,
             LastResponseMessage: response?.Message,
-            LastError: lastError);
-        var json = JsonSerializer.Serialize(message);
+            LastError: lastError,
+            CaptureMode: _captureSession?.Mode.ToString(),
+            RingBufferState: _captureSession?.State.ToString(),
+            MeasuredFps: _lastHealth?.MeasuredFps,
+            CaptureDegraded: _lastHealth?.IsDegraded ?? false,
+            CaptureDegradedReason: _lastHealth?.DegradedReason,
+            CameraError: _cameraError,
+            LastStrokeFrameCount: _lastStrokeFrameCount);
+        PostToUi("status", message);
+    }
+
+    private void PostPreviewFrame(byte[] jpeg)
+    {
+        PostToUi("preview", new { JpegBase64 = Convert.ToBase64String(jpeg) });
+    }
+
+    private void PostToUi(string kind, object payload)
+    {
+        var envelope = new { kind, payload };
+        var json = JsonSerializer.Serialize(envelope);
         Browser.CoreWebView2?.PostWebMessageAsJson(json);
     }
 
     private void OnClosed(object? sender, EventArgs e)
     {
         _connector?.Disconnect();
+        _webcam?.Close();
+        _webcam?.Dispose();
         _settingsStore.Save(_settings);
     }
 }

@@ -8,16 +8,43 @@
 <body>
   <main>
     <h1>GolfSimVision</h1>
-    <p class="subtitle">App shell + GSPro connector -- manual test harness (ticket #2)</p>
+    <p class="subtitle">App shell + GSPro connector + webcam capture -- manual test harness</p>
 
-    <section class="status">
-      <div class="row"><span class="label">Connection</span><span id="connectionState">&mdash;</span></div>
-      <div class="row"><span class="label">Ready for next shot</span><span id="readyState">&mdash;</span></div>
-      <div class="row"><span class="label">Last response</span><span id="lastResponse">&mdash;</span></div>
-      <div class="row error" id="lastError"></div>
-    </section>
+    <div class="columns">
+      <section class="preview-pane">
+        <h2>Live preview</h2>
+        <img id="preview" alt="camera preview (waiting for first frame)" />
+        <div class="row error" id="cameraError"></div>
+      </section>
 
-    <button id="sendTestShot">Send Test Shot</button>
+      <section class="status-pane">
+        <h2>GSPro</h2>
+        <div class="status">
+          <div class="row"><span class="label">Connection</span><span id="connectionState">&mdash;</span></div>
+          <div class="row"><span class="label">Ready for next shot</span><span id="readyState">&mdash;</span></div>
+          <div class="row"><span class="label">Last response</span><span id="lastResponse">&mdash;</span></div>
+          <div class="row error" id="lastError"></div>
+        </div>
+        <button id="sendTestShot">Send Test Shot</button>
+
+        <h2>Capture</h2>
+        <div class="status">
+          <div class="row"><span class="label">Mode</span><span id="captureMode">&mdash;</span></div>
+          <div class="row"><span class="label">Ring buffer</span><span id="ringBufferState">&mdash;</span></div>
+          <div class="row"><span class="label">Measured fps</span><span id="measuredFps">&mdash;</span></div>
+          <div class="row"><span class="label">Last stroke frames</span><span id="lastStrokeFrameCount">&mdash;</span></div>
+          <div class="row error" id="captureDegraded"></div>
+        </div>
+        <div class="button-row">
+          <button id="setFullShot">Full-Shot Mode</button>
+          <button id="setPutting">Putting Mode</button>
+        </div>
+        <div class="button-row">
+          <button id="triggerStroke">Trigger Test Stroke</button>
+          <button id="endStroke">End Test Stroke</button>
+        </div>
+      </section>
+    </div>
   </main>
   <script src="app.js"></script>
 </body>

@@ -13,13 +13,44 @@ h1 {
   margin-bottom: 0.25rem;
 }
 
+h2 {
+  font-size: 1rem;
+  color: #c7c7c7;
+  margin: 1.25rem 0 0.5rem;
+}
+
 .subtitle {
   color: #9a9a9a;
   margin-top: 0;
 }
 
+.columns {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+}
+
+.preview-pane {
+  flex: 1;
+  min-width: 0;
+}
+
+.status-pane {
+  width: 320px;
+  flex-shrink: 0;
+}
+
+#preview {
+  width: 100%;
+  max-width: 640px;
+  aspect-ratio: 16 / 9;
+  background: #000;
+  border: 1px solid #333;
+  border-radius: 6px;
+  object-fit: contain;
+}
+
 .status {
-  margin: 1.5rem 0;
   padding: 1rem 1.25rem;
   border: 1px solid #333;
   border-radius: 6px;
@@ -30,7 +61,7 @@ h1 {
   display: flex;
   justify-content: space-between;
   gap: 1rem;
-  line-height: 2;
+  line-height: 1.9;
 }
 
 .label {
@@ -40,11 +71,18 @@ h1 {
 .error {
   color: #ff6b6b;
   justify-content: flex-start;
+  min-height: 1.2em;
+}
+
+.button-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
 }
 
 button {
-  font-size: 1rem;
-  padding: 0.6rem 1.2rem;
+  font-size: 0.9rem;
+  padding: 0.5rem 0.9rem;
   cursor: pointer;
   border-radius: 4px;
   border: 1px solid #444;

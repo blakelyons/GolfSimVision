@@ -6,6 +6,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
+    <!-- OpenCvSharp4's analyzer (pulled in transitively via the project reference)
+         targets a newer Roslyn than the installed SDK ships (a packaging mismatch). -->
+    <NoWarn>CS9057</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
