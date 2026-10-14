@@ -21,4 +21,7 @@ public sealed record AppStatusMessage(
     string? CaptureDegradedReason = null,
     string? CameraError = null,
     int? LastStrokeFrameCount = null,
-    ZoneConfig? Zone = null);
+    ZoneConfig? Zone = null,
+    double? CalibrationMillimetersPerPixel = null,
+    int? CalibrationVersion = null,
+    string? CalibrationError = null);

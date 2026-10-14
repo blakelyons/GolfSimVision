@@ -51,6 +51,31 @@
           <button id="triggerStroke">Trigger Test Stroke</button>
           <button id="endStroke">End Test Stroke</button>
         </div>
+
+        <h2>Calibration</h2>
+        <div class="status">
+          <div class="row"><span class="label">mm/px</span><span id="calMmPerPixel">&mdash;</span></div>
+          <div class="row"><span class="label">Version</span><span id="calVersion">&mdash;</span></div>
+          <div class="row error" id="calibrationError"></div>
+        </div>
+        <p class="hint">Manual method (mechanism only, accuracy unverified): enter the
+          pixel coordinates of a rectangle's 4 corners on the live preview, in order
+          (top-left, top-right, bottom-right, bottom-left), and its real-world size.</p>
+        <div class="cal-grid">
+          <input id="calTLx" type="number" placeholder="TL x" />
+          <input id="calTLy" type="number" placeholder="TL y" />
+          <input id="calTRx" type="number" placeholder="TR x" />
+          <input id="calTRy" type="number" placeholder="TR y" />
+          <input id="calBRx" type="number" placeholder="BR x" />
+          <input id="calBRy" type="number" placeholder="BR y" />
+          <input id="calBLx" type="number" placeholder="BL x" />
+          <input id="calBLy" type="number" placeholder="BL y" />
+          <input id="calWidthMm" type="number" placeholder="width (mm)" />
+          <input id="calHeightMm" type="number" placeholder="height (mm)" />
+        </div>
+        <div class="button-row">
+          <button id="calibrate">Calibrate</button>
+        </div>
       </section>
     </div>
   </main>

@@ -3,6 +3,7 @@ using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows;
+using GolfSimVision.Calibration;
 using GolfSimVision.Capture;
 using GolfSimVision.Settings;
 using GolfSimVision.Simulator;
@@ -25,6 +26,8 @@ public partial class MainWindow : Window
     };
 
     private readonly SettingsStore _settingsStore = new();
+    private readonly CalibrationService _calibrationService = new(new CalibrationStore());
+    private string? _calibrationError;
 
     // Not readonly: zone/gateway updates (and, later, calibration) mutate this via
     // `with` and persist immediately, not only at clean app-close -- a dragged zone
@@ -140,7 +143,35 @@ public partial class MainWindow : Window
             case "updateZoneConfig":
                 UpdateZoneConfig(request.Zone);
                 break;
+            case "calibrate":
+                Calibrate(request.Corners, request.RealWidthMm, request.RealHeightMm);
+                break;
         }
+    }
+
+    private void Calibrate(PixelPoint[]? corners, double? realWidthMm, double? realHeightMm)
+    {
+        if (corners is not { Length: 4 } || realWidthMm is not { } w || realHeightMm is not { } h)
+        {
+            _calibrationError = "Calibration needs exactly 4 corners plus a real width and height";
+            PostStatus();
+            return;
+        }
+
+        try
+        {
+            var correspondences = RectangleCalibration.BuildCorrespondences(
+                corners[0], corners[1], corners[2], corners[3], w, h);
+            _calibrationService.Calibrate(correspondences);
+            _calibrationError = null;
+        }
+        catch (Exception ex)
+        {
+            // Degenerate input (collinear/duplicate corners) throws from HomographySolver
+            // -- surfaced to the UI rather than crashing the app.
+            _calibrationError = ex.Message;
+        }
+        PostStatus();
     }
 
     private void UpdateZoneConfig(ZoneConfig? zone)
@@ -216,7 +247,10 @@ public partial class MainWindow : Window
             CaptureDegradedReason: _lastHealth?.DegradedReason,
             CameraError: _cameraError,
             LastStrokeFrameCount: _lastStrokeFrameCount,
-            Zone: _settings.Zone);
+            Zone: _settings.Zone,
+            CalibrationMillimetersPerPixel: _calibrationService.Current?.MillimetersPerPixel,
+            CalibrationVersion: _calibrationService.Current?.Version,
+            CalibrationError: _calibrationError);
         PostToUi("status", message);
     }
 

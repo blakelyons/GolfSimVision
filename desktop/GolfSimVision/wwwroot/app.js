@@ -20,15 +20,40 @@ const measuredFpsEl = el("measuredFps");
 const lastStrokeFrameCountEl = el("lastStrokeFrameCount");
 const captureDegradedEl = el("captureDegraded");
 
-function post(type, mode, zone) {
-  window.chrome.webview.postMessage({ type, mode, zone });
+const calMmPerPixelEl = el("calMmPerPixel");
+const calVersionEl = el("calVersion");
+const calibrationErrorEl = el("calibrationError");
+
+function post(type, extra = {}) {
+  window.chrome.webview.postMessage({ type, ...extra });
 }
 
 el("sendTestShot").addEventListener("click", () => post("sendTestShot"));
-el("setFullShot").addEventListener("click", () => post("setCaptureMode", "fullShot"));
-el("setPutting").addEventListener("click", () => post("setCaptureMode", "putting"));
+el("setFullShot").addEventListener("click", () => post("setCaptureMode", { mode: "fullShot" }));
+el("setPutting").addEventListener("click", () => post("setCaptureMode", { mode: "putting" }));
 el("triggerStroke").addEventListener("click", () => post("triggerTestStroke"));
 el("endStroke").addEventListener("click", () => post("endTestStroke"));
+
+el("calibrate").addEventListener("click", () => {
+  const num = (id) => parseFloat(el(id).value);
+  const corners = [
+    { x: num("calTLx"), y: num("calTLy") },
+    { x: num("calTRx"), y: num("calTRy") },
+    { x: num("calBRx"), y: num("calBRy") },
+    { x: num("calBLx"), y: num("calBLy") },
+  ];
+  if (corners.some((p) => Number.isNaN(p.x) || Number.isNaN(p.y))) {
+    calibrationErrorEl.textContent = "All 4 corners need both x and y.";
+    return;
+  }
+  const realWidthMm = num("calWidthMm");
+  const realHeightMm = num("calHeightMm");
+  if (Number.isNaN(realWidthMm) || Number.isNaN(realHeightMm)) {
+    calibrationErrorEl.textContent = "Enter the rectangle's real width and height (mm).";
+    return;
+  }
+  post("calibrate", { corners, realWidthMm, realHeightMm });
+});
 
 function applyStatus(status) {
   connectionStateEl.textContent = status.ConnectionState ?? "—";
@@ -45,6 +70,11 @@ function applyStatus(status) {
   lastStrokeFrameCountEl.textContent = status.LastStrokeFrameCount ?? "—";
   cameraErrorEl.textContent = status.CameraError ? `Camera failed to open: ${status.CameraError}` : "";
   captureDegradedEl.textContent = status.CaptureDegraded ? `Degraded: ${status.CaptureDegradedReason ?? ""}` : "";
+
+  calMmPerPixelEl.textContent =
+    status.CalibrationMillimetersPerPixel != null ? status.CalibrationMillimetersPerPixel.toFixed(4) : "—";
+  calVersionEl.textContent = status.CalibrationVersion ?? "—";
+  calibrationErrorEl.textContent = status.CalibrationError ?? "";
 
   // Kept as local state (zone) so an in-progress drag doesn't fight the backend's
   // periodically-pushed value -- same caution as V1's CameraView.tsx.
@@ -176,7 +206,7 @@ canvas.addEventListener("mouseup", () => {
   }
   dragging = null;
   dragStart = null;
-  post("updateZoneConfig", undefined, zone);
+  post("updateZoneConfig", { zone });
   draw();
 });
 

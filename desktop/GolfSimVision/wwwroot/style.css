@@ -85,6 +85,23 @@ h2 {
   margin-top: 0.5rem;
 }
 
+.cal-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+}
+
+.cal-grid input {
+  background: #181b20;
+  border: 1px solid #333;
+  border-radius: 4px;
+  color: #e8e8e8;
+  padding: 0.35rem 0.5rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
 button {
   font-size: 0.9rem;
   padding: 0.5rem 0.9rem;
