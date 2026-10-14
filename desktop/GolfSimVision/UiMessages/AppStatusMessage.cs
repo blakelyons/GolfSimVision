@@ -29,4 +29,7 @@ public sealed record AppStatusMessage(
     string? DetectorError = null,
     PuttMeasurement? LastPutt = null,
     string? LastPuttRejectionReason = null,
-    string? LastPuttSendError = null);
+    string? LastPuttSendError = null,
+    string? LanIp = null,
+    string? R10ConnectionState = null,
+    string? LastR10ShotSendError = null);

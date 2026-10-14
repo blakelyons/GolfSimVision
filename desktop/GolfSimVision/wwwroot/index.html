@@ -94,6 +94,17 @@
           VLA, spin axis, and total spin are always fabricated placeholders for a putt
           (GSPRO_PUTTING.md exp 8) -- never implied to be measured. A rejected putt is
           never sent to GSPro.</p>
+
+        <h2>R10 / E6 Connect</h2>
+        <div class="status">
+          <div class="row"><span class="label">This PC's LAN IP</span><span id="lanIp">&mdash;</span></div>
+          <div class="row"><span class="label">Port</span><span>2483</span></div>
+          <div class="row"><span class="label">Connection</span><span id="r10ConnectionState">&mdash;</span></div>
+          <div class="row error" id="r10SendError"></div>
+        </div>
+        <p class="hint">In the Garmin Golf app, point the simulator connection at the LAN
+          IP above, port 2483. A full shot relays into GSPro through the same connection
+          as everything else on this page -- no separate gspro-r10.exe needed.</p>
       </section>
     </div>
   </main>

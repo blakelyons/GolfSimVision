@@ -35,6 +35,10 @@ const puttTotalSpinEl = el("puttTotalSpin");
 const puttSendStatusEl = el("puttSendStatus");
 const puttRejectionEl = el("puttRejection");
 
+const lanIpEl = el("lanIp");
+const r10ConnectionStateEl = el("r10ConnectionState");
+const r10SendErrorEl = el("r10SendError");
+
 // Mirrors GsProCodec.BuildPutt's fabricated-value formula (protocol.py's
 // rolling_spin_rpm) -- shown so the provenance display reflects what was actually sent,
 // not a static placeholder.
@@ -115,6 +119,10 @@ function applyStatus(status) {
     puttSendStatusEl.textContent = "—";
     puttRejectionEl.textContent = status.LastPuttRejectionReason ? `Rejected (not sent): ${status.LastPuttRejectionReason}` : "";
   }
+
+  lanIpEl.textContent = status.LanIp ?? "(not detected)";
+  r10ConnectionStateEl.textContent = status.R10ConnectionState ?? "—";
+  r10SendErrorEl.textContent = status.LastR10ShotSendError ? `Shot relay failed: ${status.LastR10ShotSendError}` : "";
 
   // Kept as local state (zone) so an in-progress drag doesn't fight the backend's
   // periodically-pushed value -- same caution as V1's CameraView.tsx.

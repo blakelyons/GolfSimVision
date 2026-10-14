@@ -6,6 +6,7 @@ using System.Windows;
 using GolfSimVision.Calibration;
 using GolfSimVision.Capture;
 using GolfSimVision.Detection;
+using GolfSimVision.LaunchMonitor;
 using GolfSimVision.Settings;
 using GolfSimVision.Simulator;
 using GolfSimVision.UiMessages;
@@ -52,6 +53,10 @@ public partial class MainWindow : Window
     private string? _lastPuttRejectionReason;
     private string? _lastPuttSendError;
 
+    private readonly E6ConnectServer _r10Server = new();
+    private readonly string? _lanIp = NetworkInfo.GetLocalIPv4();
+    private string? _lastR10ShotSendError;
+
     public MainWindow()
     {
         InitializeComponent();
@@ -75,6 +80,12 @@ public partial class MainWindow : Window
         _connector.OnStatus = _ => Dispatcher.Invoke(() => PostStatus());
         _connector.OnResponse = response => Dispatcher.Invoke(() => PostStatus(response));
         _connector.Connect();
+
+        // R10 full shots relay through this same SimulatorConnector (ADR-0001/0002) --
+        // not a second connection to GSPro.
+        _r10Server.OnStatus = _ => Dispatcher.Invoke(() => PostStatus());
+        _r10Server.OnShotReceived = ballData => RelayR10ShotToGsPro(ballData);
+        _r10Server.Start();
 
         await OpenCameraAsync();
         PostStatus();
@@ -227,6 +238,48 @@ public partial class MainWindow : Window
         }
     }
 
+    /// <summary>
+    /// A real R10 full shot relays into GSPro through this same SimulatorConnector
+    /// (ADR-0001/0002) -- never a second connection. Called synchronously on the E6
+    /// server's own recv thread (same reasoning as SubmitPuttToGsPro: no UI thread
+    /// involved, so no freeze risk from Send()'s pacing guard).
+    /// </summary>
+    private void RelayR10ShotToGsPro(BallData ballData)
+    {
+        var connector = _connector;
+        string? error;
+        if (connector is null || !connector.IsConnected)
+        {
+            error = "Not connected to GSPro";
+        }
+        else
+        {
+            try
+            {
+                var payload = new ShotPayload
+                {
+                    DeviceID = connector.DeviceId,
+                    Units = connector.Units,
+                    ShotNumber = connector.NextShotNumber(),
+                    APIversion = "1",
+                    BallData = ballData,
+                };
+                connector.Send(payload);
+                error = null;
+            }
+            catch (Exception ex)
+            {
+                error = ex.Message;
+            }
+        }
+
+        Dispatcher.Invoke(() =>
+        {
+            _lastR10ShotSendError = error;
+            PostStatus();
+        });
+    }
+
     private void OnWebMessageReceived(object? sender, CoreWebView2WebMessageReceivedEventArgs e)
     {
         UiRequest? request;
@@ -372,7 +425,10 @@ public partial class MainWindow : Window
             DetectorError: _detectorError,
             LastPutt: _lastPuttMeasurement,
             LastPuttRejectionReason: _lastPuttRejectionReason,
-            LastPuttSendError: _lastPuttSendError);
+            LastPuttSendError: _lastPuttSendError,
+            LanIp: _lanIp,
+            R10ConnectionState: _r10Server.State.ToString(),
+            LastR10ShotSendError: _lastR10ShotSendError);
         PostToUi("status", message);
     }
 
@@ -394,6 +450,7 @@ public partial class MainWindow : Window
         _webcam?.Close();
         _webcam?.Dispose();
         _detector?.Dispose();
+        _r10Server.Dispose();
         _settingsStore.Save(_settings);
     }
 }
