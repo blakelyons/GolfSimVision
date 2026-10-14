@@ -22,6 +22,7 @@ Read in this order:
 | [`docs/GolfSimVision-Project-Readiness-Review.md`](docs/GolfSimVision-Project-Readiness-Review.md) | Research findings, verified protocol facts, the five main risks |
 | [`docs/GolfSimVision-Architecture-Decisions.md`](docs/GolfSimVision-Architecture-Decisions.md) | ADR-0001 … ADR-0008 — accepted, do not re-litigate |
 | [`docs/GolfSimVision-Phase0-Harness-Specs.md`](docs/GolfSimVision-Phase0-Harness-Specs.md) | Build specs for the two Phase 0 harnesses |
+| [`docs/GolfSimVision-MVP-Scope.md`](docs/GolfSimVision-MVP-Scope.md) | Phase 1 build order — what ships now vs. what's deferred |
 | [`docs/GolfSimVision-Prototype-Appendix.md`](docs/GolfSimVision-Prototype-Appendix.md) | Early exploratory notes — **unverified; parts disproven** |
 
 > The Prototype Appendix contains sample code built on a `HaishinKit` RTSP-server API
