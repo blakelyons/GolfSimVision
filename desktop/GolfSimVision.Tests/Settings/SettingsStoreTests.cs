@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using GolfSimVision.Settings;
+using GolfSimVision.Zones;
 using Xunit;
 
 namespace GolfSimVision.Tests.Settings;
@@ -34,6 +35,19 @@ public class SettingsStoreTests : IDisposable
         var reloaded = new SettingsStore(_tempDir).Load();
 
         Assert.Equal(settings, reloaded);
+    }
+
+    [Fact]
+    public void SaveThenLoadRoundTripsANonDefaultZoneConfig()
+    {
+        var store = new SettingsStore(_tempDir);
+        var zone = new ZoneConfig(new StartZone(0.12, 0.2, 0.3, 0.4), 0.7);
+        var settings = new AppSettings { Zone = zone };
+
+        store.Save(settings);
+        var reloaded = new SettingsStore(_tempDir).Load();
+
+        Assert.Equal(zone, reloaded.Zone);
     }
 
     [Fact]

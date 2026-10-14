@@ -1,3 +1,5 @@
+using GolfSimVision.Zones;
+
 namespace GolfSimVision.UiMessages;
 
 /// <summary>
@@ -18,4 +20,5 @@ public sealed record AppStatusMessage(
     bool CaptureDegraded = false,
     string? CaptureDegradedReason = null,
     string? CameraError = null,
-    int? LastStrokeFrameCount = null);
+    int? LastStrokeFrameCount = null,
+    ZoneConfig? Zone = null);

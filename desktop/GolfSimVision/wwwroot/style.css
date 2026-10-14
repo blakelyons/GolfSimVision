@@ -47,7 +47,12 @@ h2 {
   background: #000;
   border: 1px solid #333;
   border-radius: 6px;
-  object-fit: contain;
+}
+
+.hint {
+  color: #808080;
+  font-size: 0.85rem;
+  max-width: 640px;
 }
 
 .status {

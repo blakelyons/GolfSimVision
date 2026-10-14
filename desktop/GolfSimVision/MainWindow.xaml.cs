@@ -7,6 +7,7 @@ using GolfSimVision.Capture;
 using GolfSimVision.Settings;
 using GolfSimVision.Simulator;
 using GolfSimVision.UiMessages;
+using GolfSimVision.Zones;
 using Microsoft.Web.WebView2.Core;
 
 namespace GolfSimVision;
@@ -24,7 +25,11 @@ public partial class MainWindow : Window
     };
 
     private readonly SettingsStore _settingsStore = new();
-    private readonly AppSettings _settings;
+
+    // Not readonly: zone/gateway updates (and, later, calibration) mutate this via
+    // `with` and persist immediately, not only at clean app-close -- a dragged zone
+    // should survive even if the app is later closed uncleanly.
+    private AppSettings _settings;
 
     private SimulatorConnector? _connector;
     private GsProCodec? _codec;
@@ -132,7 +137,20 @@ public partial class MainWindow : Window
             case "endTestStroke":
                 _captureSession?.EndStroke();
                 break;
+            case "updateZoneConfig":
+                UpdateZoneConfig(request.Zone);
+                break;
         }
+    }
+
+    private void UpdateZoneConfig(ZoneConfig? zone)
+    {
+        if (zone is null) return;
+        _settings = _settings with { Zone = ZoneConfigClamping.Clamp(zone) };
+        // Persisted immediately, not deferred to app-close -- see the _settings field's
+        // own comment on why.
+        _settingsStore.Save(_settings);
+        PostStatus();
     }
 
     private void SetCaptureMode(string? mode)
@@ -197,7 +215,8 @@ public partial class MainWindow : Window
             CaptureDegraded: _lastHealth?.IsDegraded ?? false,
             CaptureDegradedReason: _lastHealth?.DegradedReason,
             CameraError: _cameraError,
-            LastStrokeFrameCount: _lastStrokeFrameCount);
+            LastStrokeFrameCount: _lastStrokeFrameCount,
+            Zone: _settings.Zone);
         PostToUi("status", message);
     }
 

@@ -1,7 +1,9 @@
+using GolfSimVision.Zones;
+
 namespace GolfSimVision.Settings;
 
-/// <summary>Persisted app configuration. Grows as later tickets add zone/gateway and
-/// calibration settings.</summary>
+/// <summary>Persisted app configuration. Grows as later tickets add calibration
+/// settings.</summary>
 public sealed record AppSettings
 {
     public string GsProHost { get; init; } = "127.0.0.1";
@@ -23,4 +25,8 @@ public sealed record AppSettings
 
     /// Frames of pre-roll kept while the ring buffer is armed (Putting mode).
     public int RingBufferCapacity { get; init; } = 240;
+
+    /// Where the ball rests and where a stroke is recognized -- user-configurable via
+    /// the live-preview drag UI, consumed by the detection pipeline (a later ticket).
+    public ZoneConfig Zone { get; init; } = ZoneConfig.Default;
 }

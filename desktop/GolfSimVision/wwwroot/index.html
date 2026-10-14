@@ -8,13 +8,21 @@
 <body>
   <main>
     <h1>GolfSimVision</h1>
-    <p class="subtitle">App shell + GSPro connector + webcam capture -- manual test harness</p>
+    <p class="subtitle">App shell + GSPro connector + webcam capture + zone/gateway config -- manual test harness</p>
 
     <div class="columns">
       <section class="preview-pane">
         <h2>Live preview</h2>
-        <img id="preview" alt="camera preview (waiting for first frame)" />
+        <!-- Image and zone/gateway overlay are drawn together in one draw() pass onto
+             this single canvas -- never a server-rendered frame plus a separate
+             client-side overlay layer. -->
+        <canvas id="preview" width="1280" height="720"></canvas>
         <div class="row error" id="cameraError"></div>
+        <div class="button-row">
+          <button id="toggleEdit">Edit Zones</button>
+        </div>
+        <p class="hint">In edit mode: drag inside the frame to draw the start zone; drag
+          near the amber line to move the gateway.</p>
       </section>
 
       <section class="status-pane">
