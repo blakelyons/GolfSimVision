@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>GolfSimVision</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main>
+    <h1>GolfSimVision</h1>
+    <p class="subtitle">App shell + GSPro connector -- manual test harness (ticket #2)</p>
+
+    <section class="status">
+      <div class="row"><span class="label">Connection</span><span id="connectionState">&mdash;</span></div>
+      <div class="row"><span class="label">Ready for next shot</span><span id="readyState">&mdash;</span></div>
+      <div class="row"><span class="label">Last response</span><span id="lastResponse">&mdash;</span></div>
+      <div class="row error" id="lastError"></div>
+    </section>
+
+    <button id="sendTestShot">Send Test Shot</button>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,57 @@
+:root {
+  color-scheme: dark;
+}
+
+body {
+  font-family: Segoe UI, system-ui, sans-serif;
+  margin: 2rem;
+  background: #111317;
+  color: #e8e8e8;
+}
+
+h1 {
+  margin-bottom: 0.25rem;
+}
+
+.subtitle {
+  color: #9a9a9a;
+  margin-top: 0;
+}
+
+.status {
+  margin: 1.5rem 0;
+  padding: 1rem 1.25rem;
+  border: 1px solid #333;
+  border-radius: 6px;
+  background: #181b20;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  line-height: 2;
+}
+
+.label {
+  color: #9a9a9a;
+}
+
+.error {
+  color: #ff6b6b;
+  justify-content: flex-start;
+}
+
+button {
+  font-size: 1rem;
+  padding: 0.6rem 1.2rem;
+  cursor: pointer;
+  border-radius: 4px;
+  border: 1px solid #444;
+  background: #2563eb;
+  color: white;
+}
+
+button:hover {
+  background: #1d4ed8;
+}
