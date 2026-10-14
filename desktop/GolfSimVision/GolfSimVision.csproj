@@ -17,10 +17,19 @@
     <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.*" />
     <PackageReference Include="OpenCvSharp4" Version="4.*" />
     <PackageReference Include="OpenCvSharp4.runtime.win" Version="4.*" />
+    <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.*" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="wwwroot\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <!-- Not committed to git (*.onnx, see .gitignore): export it yourself from
+         prototypes/webcam-putting/detection/models/golf_ball_v1.pt (see
+         Detection/BallDetector.cs's doc comment for the exact export command) and place
+         it here. The app runs without it, with detection reporting "model not found"
+         rather than crashing (same graceful-degradation pattern as a missing camera). -->
+    <Content Include="Models\**\*" Condition="Exists('Models')">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

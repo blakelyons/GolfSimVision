@@ -8,7 +8,7 @@
 <body>
   <main>
     <h1>GolfSimVision</h1>
-    <p class="subtitle">App shell + GSPro connector + webcam capture + zone/gateway config -- manual test harness</p>
+    <p class="subtitle">App shell + GSPro connector + webcam capture + zone/gateway config + ball detection -- manual test harness</p>
 
     <div class="columns">
       <section class="preview-pane">
@@ -76,6 +76,19 @@
         <div class="button-row">
           <button id="calibrate">Calibrate</button>
         </div>
+
+        <h2>Putt</h2>
+        <div class="status">
+          <div class="row error" id="detectorError"></div>
+          <div class="row"><span class="label">Speed</span><span id="puttSpeed">&mdash;</span></div>
+          <div class="row"><span class="label">HLA</span><span id="puttHla">&mdash;</span></div>
+          <div class="row"><span class="label">Distance</span><span id="puttDistance">&mdash;</span></div>
+          <div class="row"><span class="label">Track points</span><span id="puttTrackPoints">&mdash;</span></div>
+          <div class="row error" id="puttRejection"></div>
+        </div>
+        <p class="hint">Speed and HLA are measured. VLA, spin axis, and total spin are
+          always fabricated placeholders when a putt is sent to GSPro (ticket #7) --
+          never implied to be measured.</p>
       </section>
     </div>
   </main>

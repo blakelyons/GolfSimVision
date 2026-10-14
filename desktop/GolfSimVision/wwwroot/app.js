@@ -24,6 +24,13 @@ const calMmPerPixelEl = el("calMmPerPixel");
 const calVersionEl = el("calVersion");
 const calibrationErrorEl = el("calibrationError");
 
+const detectorErrorEl = el("detectorError");
+const puttSpeedEl = el("puttSpeed");
+const puttHlaEl = el("puttHla");
+const puttDistanceEl = el("puttDistance");
+const puttTrackPointsEl = el("puttTrackPoints");
+const puttRejectionEl = el("puttRejection");
+
 function post(type, extra = {}) {
   window.chrome.webview.postMessage({ type, ...extra });
 }
@@ -75,6 +82,21 @@ function applyStatus(status) {
     status.CalibrationMillimetersPerPixel != null ? status.CalibrationMillimetersPerPixel.toFixed(4) : "—";
   calVersionEl.textContent = status.CalibrationVersion ?? "—";
   calibrationErrorEl.textContent = status.CalibrationError ?? "";
+
+  detectorErrorEl.textContent = status.DetectorError ? `Detection unavailable: ${status.DetectorError}` : "";
+  if (status.LastPutt) {
+    puttSpeedEl.textContent = `${status.LastPutt.SpeedMph.toFixed(2)} mph`;
+    puttHlaEl.textContent = `${status.LastPutt.HlaDegrees.toFixed(2)}°`;
+    puttDistanceEl.textContent = `${status.LastPutt.DistanceFt.toFixed(2)} ft`;
+    puttTrackPointsEl.textContent = status.LastPutt.TrackPointCount;
+    puttRejectionEl.textContent = "";
+  } else {
+    puttSpeedEl.textContent = "—";
+    puttHlaEl.textContent = "—";
+    puttDistanceEl.textContent = "—";
+    puttTrackPointsEl.textContent = "—";
+    puttRejectionEl.textContent = status.LastPuttRejectionReason ? `Rejected: ${status.LastPuttRejectionReason}` : "";
+  }
 
   // Kept as local state (zone) so an in-progress drag doesn't fight the backend's
   // periodically-pushed value -- same caution as V1's CameraView.tsx.

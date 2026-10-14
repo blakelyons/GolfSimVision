@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using GolfSimVision.Calibration;
 using GolfSimVision.Capture;
+using GolfSimVision.Detection;
 using GolfSimVision.Settings;
 using GolfSimVision.Simulator;
 using GolfSimVision.UiMessages;
@@ -42,6 +43,13 @@ public partial class MainWindow : Window
     private CaptureHealth? _lastHealth;
     private string? _cameraError;
     private int? _lastStrokeFrameCount;
+
+    private BallDetector? _detector;
+    private ZoneStateMachine? _zoneStateMachine;
+    private PuttDetectionPipeline? _puttDetectionPipeline;
+    private string? _detectorError;
+    private PuttMeasurement? _lastPuttMeasurement;
+    private string? _lastPuttRejectionReason;
 
     public MainWindow()
     {
@@ -83,7 +91,11 @@ public partial class MainWindow : Window
 
         var webcam = new UsbWebcam();
         webcam.OnLog = msg => Console.WriteLine($"[capture] {msg}");
-        webcam.OnFrame = frame => _captureSession?.Ingest(frame);
+        webcam.OnFrame = frame =>
+        {
+            _captureSession?.Ingest(frame);
+            ProcessDetectionFrame(frame);
+        };
         webcam.OnPreviewFrame = jpeg => Dispatcher.Invoke(() => PostPreviewFrame(jpeg));
         webcam.OnHealth = health => Dispatcher.Invoke(() =>
         {
@@ -110,6 +122,61 @@ public partial class MainWindow : Window
         // Default to Putting mode so the manual stroke-trigger demo works without the
         // user first having to flip modes -- GolfSimVision's primary scenario.
         _captureSession.SetMode(CaptureMode.Putting);
+
+        OpenDetector(result.ActualWidth, result.ActualHeight);
+    }
+
+    private void OpenDetector(int frameWidth, int frameHeight)
+    {
+        var modelPath = Path.Combine(AppContext.BaseDirectory, "Models", "golf_ball_v1.onnx");
+        if (!BallDetector.ModelExists(modelPath))
+        {
+            // Gitignored asset (see Models/ content item's own comment) -- a fresh clone
+            // without it should still run, same graceful-degradation pattern as a
+            // missing camera, not a crash.
+            _detectorError = "model not found -- see Detection/BallDetector.cs for how to export it";
+            return;
+        }
+
+        _detector = new BallDetector(modelPath);
+        _zoneStateMachine = new ZoneStateMachine(_settings.Zone, frameWidth, frameHeight);
+        _zoneStateMachine.OnStateChanged = state =>
+        {
+            // Drives the ring buffer from the real detector instead of the manual
+            // trigger button -- ticket #3's own forward-looking design for this seam.
+            if (state == PuttState.Tracking) _captureSession?.TriggerStroke();
+        };
+        _puttDetectionPipeline = new PuttDetectionPipeline(_detector, _zoneStateMachine, _calibrationService);
+        _detectorError = null;
+    }
+
+    private void ProcessDetectionFrame(CapturedFrame frame)
+    {
+        var pipeline = _puttDetectionPipeline;
+        if (pipeline is null) return;
+
+        var outcome = pipeline.ProcessFrame(frame.BgrBytes, frame.Width, frame.Height);
+        if (outcome is null) return;
+
+        // Any finalize -- measured or rejected -- is the real "this attempt is over"
+        // signal; whichever one it was is decided below.
+        _captureSession?.EndStroke();
+
+        Dispatcher.Invoke(() =>
+        {
+            switch (outcome)
+            {
+                case PuttDetectionOutcome.Measured measured:
+                    _lastPuttMeasurement = measured.Measurement;
+                    _lastPuttRejectionReason = null;
+                    break;
+                case PuttDetectionOutcome.Rejected rejected:
+                    _lastPuttRejectionReason = rejected.Reason;
+                    _lastPuttMeasurement = null;
+                    break;
+            }
+            PostStatus();
+        });
     }
 
     private void OnWebMessageReceived(object? sender, CoreWebView2WebMessageReceivedEventArgs e)
@@ -181,6 +248,9 @@ public partial class MainWindow : Window
         // Persisted immediately, not deferred to app-close -- see the _settings field's
         // own comment on why.
         _settingsStore.Save(_settings);
+        // Live-update the running detector too, not just storage -- a drag while the
+        // camera is already open must take effect immediately.
+        if (_zoneStateMachine is not null) _zoneStateMachine.Zone = _settings.Zone;
         PostStatus();
     }
 
@@ -250,7 +320,10 @@ public partial class MainWindow : Window
             Zone: _settings.Zone,
             CalibrationMillimetersPerPixel: _calibrationService.Current?.MillimetersPerPixel,
             CalibrationVersion: _calibrationService.Current?.Version,
-            CalibrationError: _calibrationError);
+            CalibrationError: _calibrationError,
+            DetectorError: _detectorError,
+            LastPutt: _lastPuttMeasurement,
+            LastPuttRejectionReason: _lastPuttRejectionReason);
         PostToUi("status", message);
     }
 
@@ -271,6 +344,7 @@ public partial class MainWindow : Window
         _connector?.Disconnect();
         _webcam?.Close();
         _webcam?.Dispose();
+        _detector?.Dispose();
         _settingsStore.Save(_settings);
     }
 }

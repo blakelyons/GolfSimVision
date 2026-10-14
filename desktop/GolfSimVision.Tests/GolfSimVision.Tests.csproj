@@ -15,10 +15,24 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.*" />
     <PackageReference Include="xunit" Version="2.*" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.*" />
+    <!-- Only BallDetectorSmokeTest needs this: a real-assets verification tool, not
+         part of the project's pure-logic test boundary (see that file's doc comment). -->
+    <PackageReference Include="OpenCvSharp4" Version="4.*" />
+    <PackageReference Include="OpenCvSharp4.runtime.win" Version="4.*" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\GolfSimVision\GolfSimVision.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Mirrors the main project's own gitignored Models content item, so
+         BallDetectorSmokeTest can find the model from the test output directory too. -->
+    <OnnxModelFiles Include="..\GolfSimVision\Models\**\*" Condition="Exists('..\GolfSimVision\Models')" />
+    <Content Include="@(OnnxModelFiles)">
+      <Link>Models\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>

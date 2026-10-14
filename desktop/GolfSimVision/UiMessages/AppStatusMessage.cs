@@ -1,3 +1,4 @@
+using GolfSimVision.Detection;
 using GolfSimVision.Zones;
 
 namespace GolfSimVision.UiMessages;
@@ -24,4 +25,7 @@ public sealed record AppStatusMessage(
     ZoneConfig? Zone = null,
     double? CalibrationMillimetersPerPixel = null,
     int? CalibrationVersion = null,
-    string? CalibrationError = null);
+    string? CalibrationError = null,
+    string? DetectorError = null,
+    PuttMeasurement? LastPutt = null,
+    string? LastPuttRejectionReason = null);
