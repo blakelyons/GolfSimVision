@@ -10,6 +10,7 @@ from corpus import (
     GroundTruth,
     Timing,
     append_index_entry,
+    load_clip,
     save_clip,
 )
 from stats import corpus_summary, histogram, intervals_ms, jitter_report, percentile
@@ -117,6 +118,24 @@ class TestCorpusSummary(unittest.TestCase):
         self.assertEqual(summary["with_tier2_labels"], 1)
         # 3 intervals total across both clips: 10, 10, 8 ms.
         self.assertAlmostEqual(summary["jitter"]["median"], 10.0)
+
+    def test_reflects_labelling_done_after_the_index_entry_was_written(self):
+        # Mirrors the real workflow: capture.py appends the index entry with
+        # has_ground_truth/labels_tier2 both False, then label.py updates clip.json
+        # afterward without touching index.jsonl.
+        clip = make_meta("clip_0001", "valid_putt", [0.0, 0.010, 0.020])
+        save_clip(self.root, clip)
+        append_index_entry(self.root, clip)
+
+        meta = load_clip(self.root, "clip_0001")
+        meta.ground_truth = GroundTruth(method="two_gate_manual")
+        meta.labels_tier2 = True
+        save_clip(self.root, meta)
+
+        summary = corpus_summary(self.root)
+
+        self.assertEqual(summary["with_ground_truth"], 1)
+        self.assertEqual(summary["with_tier2_labels"], 1)
 
     def test_empty_corpus(self):
         summary = corpus_summary(self.root)

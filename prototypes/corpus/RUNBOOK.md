@@ -18,12 +18,14 @@ results afterward. **`capture.py` runs on the Windows PC** with the webcam conne
       spec's default), both inside the camera's view, for two-gate ground truth.
 - [ ] If using the ramp method for repeatable speeds: ramp available with release
       heights marked (10/20/30/45/60cm — see `label.py`'s reference table).
-- [ ] At least two ball colors available (white + yellow), plus one with a heavy
-      alignment line/logo, per the test matrix.
+- [ ] At least one ball available with a heavy alignment line/logo, in addition to a
+      plain white ball, per the test matrix (yellow dropped — not available).
 - [ ] Run `python capture.py --corpus ./corpus --device-name "<your camera>"` once and
       check the printed `requested:`/`actual:` line — confirm the camera actually
-      granted MJPG/1280x720/120fps before collecting anything. A silent fallback to
-      30fps invalidates the whole session; the tool warns if this happens, but check it.
+      granted 1280x720/60fps before collecting anything (this camera's confirmed real
+      ceiling is 60fps via Media Foundation, not the 120fps originally assumed — see
+      `docs/CAMERA_CAPABILITIES.md`). A silent fallback to ~30fps invalidates the whole
+      session; the tool warns if this happens, but check it.
 
 ## Phase 1 — Auto-trigger baseline (~15 min, do first)
 
@@ -62,7 +64,7 @@ python capture.py --corpus ./corpus
 |---|---|---|
 | Speed | slow (~2mph), medium (~5mph), firm (~9mph) | 5 each (15 clips) |
 | Line | straight, ~3° left, ~3° right | spread across the 15 |
-| Ball | white, yellow, heavy alignment line/logo | spread across the 15 |
+| Ball | white, + one with heavy alignment line/logo (no yellow available) | spread across the 15 |
 | Surface | usual mat, + one other if available | mostly usual mat |
 | Lighting | ambient; repeat a subset with an added LED panel | subset |
 

@@ -97,8 +97,9 @@ def score_corpus(detector: Detector, corpus_root: Path) -> dict:
     track_point_counts: list[int] = []
     rejection_counts: dict[str, int] = {}
 
-    for entry in entries:
+    for i, entry in enumerate(entries):
         clip_id = entry["clip_id"]
+        print(f"[replay] {i + 1}/{len(entries)}: {clip_id}", flush=True)
         meta = load_clip(corpus_root, clip_id)
         measurements = run_detector_on_clip(detector, corpus_root, clip_id)
         track_point_counts.extend(getattr(m, "track_points", 0) for m in measurements)

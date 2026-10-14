@@ -1,11 +1,26 @@
-"""Webcam capture tool. Runs on the Windows PC only (DirectShow, the physical webcam).
+"""Webcam capture tool. Runs on the Windows PC only (Media Foundation, the physical
+webcam).
 
 Per docs/GolfSimVision-Phase0-Harness-Specs.md "P0-1" section 1:
-- FOURCC must be set before width/height/fps, or it's silently ignored.
 - Never trust requested camera settings -- read back what was actually granted and log it.
 - time.perf_counter() immediately after cap.read() returns, before any conversion.
 - Manual SPACE-to-save is primary; --auto-trigger (frame-diff) exists only to characterise
   a naive trigger's false-positive rate, not to collect the corpus.
+
+Backend and fps ceiling, found live 2026-09-17 (P0-1 setup, this specific camera):
+- cv2.CAP_DSHOW (DirectShow) silently caps this camera at ~30fps no matter what
+  width/height/fps is requested (measured from real frame timestamps, not just the
+  driver's own readback, which happily reports back whatever was asked for). Confirmed
+  even after a clean reboot, ruling out a stuck driver state.
+- cv2.CAP_MSMF (Media Foundation) gets genuine ~60fps at both 1280x720 and 1920x1080 --
+  MSMF is what this tool now uses. Windows' own camera settings UI confirms 60fps is
+  this camera's real hardware ceiling; the 120fps originally assumed in
+  docs/GolfSimVision-Architecture-Decisions.md's P0-1 section does not hold for this
+  camera and was never previously verified against real hardware capability.
+- Under MSMF, cap.set(CAP_PROP_FOURCC, ...) reports failure (returns False) and the
+  fourcc readback is unusable -- but real frames still decode fine through cap.read(),
+  so this is harmless. FOURCC is still requested for the record (the "actual" dict is
+  what matters, never "requested" -- same principle as the fps check below).
 
 The cv2.VideoCapture/imshow/waitKey loop below is the interactive shell -- it can't be
 unit tested from here (no display, no physical mat). RingBuffer, clip saving, and camera
@@ -97,18 +112,36 @@ def fourcc_to_str(value: float) -> str:
 
 
 def open_camera(index: int, width: int, height: int, fps: int) -> tuple[cv2.VideoCapture, dict, dict]:
-    """Open the camera with MJPG set first, then read back what was actually granted.
+    """Open the camera via Media Foundation, then read back what was actually granted.
 
     Returns (capture, requested, actual) so the caller can log both -- a camera that
-    silently gives 30fps must be caught here, not discovered downstream.
+    silently gives fewer fps than requested must be caught here, not discovered
+    downstream. See the module docstring for why CAP_MSMF, not CAP_DSHOW.
     """
-    cap = cv2.VideoCapture(index, cv2.CAP_DSHOW)
-    cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*"MJPG"))  # must be first
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
-    cap.set(cv2.CAP_PROP_FPS, fps)
+    # No FOURCC request here: cv2.CAP_PROP_FOURCC always reports rejection (returns
+    # False) under CAP_MSMF for this camera -- see docs/CAMERA_CAPABILITIES.md.
+    #
+    # Each step below is genuinely slow on this camera/driver -- found live that
+    # VideoCapture() and each individual cap.set() can each take ~15s under CAP_MSMF
+    # (a real renegotiation delay, not a hang) -- so every step logs before/after with a
+    # timestamp. Without this, capture.py looks identical to "stuck" for up to a minute.
+    t0 = time.perf_counter()
 
-    requested = {"width": width, "height": height, "fps": fps, "fourcc": "MJPG"}
+    def _log(msg: str) -> None:
+        print(f"[capture] [{time.perf_counter() - t0:5.1f}s] {msg}", flush=True)
+
+    _log("opening camera (CAP_MSMF) -- this can take up to ~15s on this hardware")
+    cap = cv2.VideoCapture(index, cv2.CAP_MSMF)
+    _log(f"opened, isOpened={cap.isOpened()}")
+    _log("requesting width (can take up to ~15s)")
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
+    _log("requesting height (can take up to ~15s)")
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
+    _log("requesting fps (can take up to ~15s)")
+    cap.set(cv2.CAP_PROP_FPS, fps)
+    _log("done setting properties, reading back actual values")
+
+    requested = {"width": width, "height": height, "fps": fps, "fourcc": "(not requested)"}
     actual = {
         "width": int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)),
         "height": int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)),
@@ -301,6 +334,9 @@ def run(args: argparse.Namespace) -> None:
 
     try:
         next_display = time.perf_counter()
+        wait_start = time.perf_counter()
+        first_frame_seen = False
+        next_wait_log = wait_start + 2.0
         while True:
             if worker.error:
                 print(f"[capture] {worker.error}, stopping", file=sys.stderr)
@@ -308,8 +344,22 @@ def run(args: argparse.Namespace) -> None:
 
             current = ring.latest()
             if current is None:
+                now = time.perf_counter()
+                if now >= next_wait_log:
+                    print(
+                        f"[capture] still waiting for the first frame "
+                        f"({now - wait_start:.0f}s elapsed) -- camera opened but "
+                        f"hasn't delivered a frame yet; Ctrl+C to give up",
+                        file=sys.stderr,
+                    )
+                    next_wait_log = now + 2.0
                 time.sleep(0.01)
                 continue
+            if not first_frame_seen:
+                first_frame_seen = True
+                print(
+                    f"[capture] first frame received after {time.perf_counter() - wait_start:.2f}s"
+                )
             _, latest_frame = current
 
             if auto_trigger and auto_trigger.update(latest_frame):
@@ -353,7 +403,7 @@ def main() -> None:
     parser.add_argument("--index", type=int, default=0, help="camera index")
     parser.add_argument("--width", type=int, default=1280)
     parser.add_argument("--height", type=int, default=720)
-    parser.add_argument("--fps", type=int, default=120)
+    parser.add_argument("--fps", type=int, default=60)  # confirmed hardware ceiling, see module docstring
     parser.add_argument("--pre-roll", type=float, default=4.0, help="ring buffer seconds")
     parser.add_argument("--device-name", default="", help="e.g. 'Logitech Brio'")
     parser.add_argument(

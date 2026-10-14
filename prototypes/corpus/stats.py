@@ -74,14 +74,24 @@ def all_intervals_ms(corpus_root: Path) -> list[float]:
 
 
 def corpus_summary(corpus_root: Path) -> dict:
-    """Clip counts by kind/labelling status, plus a corpus-wide jitter report."""
+    """Clip counts by kind/labelling status, plus a corpus-wide jitter report.
+
+    Labelling status is read fresh from each clip.json, not from index.jsonl's
+    has_ground_truth/labels_tier2 fields -- those are written once at capture time and
+    label.py updates clip.json afterward without touching the index, so the index copy
+    goes stale the moment anything gets labelled.
+    """
     entries = read_index(corpus_root)
+    metas = [load_clip(corpus_root, e["clip_id"]) for e in entries]
+    intervals: list[float] = []
+    for meta in metas:
+        intervals.extend(intervals_ms(meta.frames.timestamps_s))
     return {
         "clip_count": len(entries),
         "by_kind": _count_by(entries, "kind"),
-        "with_ground_truth": sum(1 for e in entries if e.get("has_ground_truth")),
-        "with_tier2_labels": sum(1 for e in entries if e.get("labels_tier2")),
-        "jitter": jitter_report(all_intervals_ms(corpus_root)),
+        "with_ground_truth": sum(1 for m in metas if m.ground_truth.method is not None),
+        "with_tier2_labels": sum(1 for m in metas if m.labels_tier2),
+        "jitter": jitter_report(intervals),
     }
 
 

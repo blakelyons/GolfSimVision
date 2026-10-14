@@ -43,9 +43,13 @@ launcher error, see the workaround documented at the top of `requirements.txt`.
 python capture.py --corpus ./corpus --index 0 --device-name "Logitech Brio"
 ```
 
-Opens the camera with MJPG set first (required at 120fps), logs requested vs. actual
-width/height/fps/fourcc, and warns if the camera silently granted a lower fps than
-requested. A dedicated `CaptureWorker` background thread does nothing but read →
+Opens the camera via Media Foundation (`cv2.CAP_MSMF`) -- found live 2026-09-17 that
+`cv2.CAP_DSHOW` silently caps this camera at ~30fps no matter what's requested, while
+MSMF genuinely delivers 60fps, this camera's real hardware ceiling (confirmed via
+Windows' own camera settings, not the 120fps originally assumed -- see
+`docs/CAMERA_CAPABILITIES.md`). Logs requested vs. actual width/height/fps/fourcc, and
+warns if the camera silently granted a lower fps than requested. A dedicated
+`CaptureWorker` background thread does nothing but read →
 timestamp (`time.perf_counter()`, immediately after `cap.read()`) → push to a ring buffer
 sized by `--pre-roll` seconds (default 4s). The main thread runs the ~15fps preview
 window (downscaled, with a readout: rolling actual fps, ring fill level, last-clip

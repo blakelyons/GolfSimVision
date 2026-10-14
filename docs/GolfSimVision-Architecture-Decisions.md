@@ -231,7 +231,7 @@ Ordered by what unblocks the most, revised now that the decisions have collapsed
 
 The highest-value asset in the project, and it needs nothing that doesn't already exist.
 
-Record 50+ real putts on Blake's existing 720p120 webcam, raw frames, with hand-labelled ground truth. Must include the adversarial cases that broke V1:
+Record 50+ real putts on Blake's existing webcam, raw frames, with hand-labelled ground truth. *(Originally assumed 720p120; confirmed live during P0-1 setup that this camera's real ceiling is 720p60 via Media Foundation, not 120fps — see `docs/CAMERA_CAPABILITIES.md`.)* Must include the adversarial cases that broke V1:
 
 - hand entering the zone to place the ball
 - putter head sweeping through after impact
