@@ -28,4 +28,5 @@ public sealed record AppStatusMessage(
     string? CalibrationError = null,
     string? DetectorError = null,
     PuttMeasurement? LastPutt = null,
-    string? LastPuttRejectionReason = null);
+    string? LastPuttRejectionReason = null,
+    string? LastPuttSendError = null);

@@ -79,6 +79,15 @@ h2 {
   min-height: 1.2em;
 }
 
+.provenance {
+  color: #9a9a9a;
+  font-style: italic;
+}
+
+.provenance .label {
+  color: #7a7a7a;
+}
+
 .button-row {
   display: flex;
   gap: 0.5rem;

@@ -29,7 +29,16 @@ const puttSpeedEl = el("puttSpeed");
 const puttHlaEl = el("puttHla");
 const puttDistanceEl = el("puttDistance");
 const puttTrackPointsEl = el("puttTrackPoints");
+const puttVlaEl = el("puttVla");
+const puttSpinAxisEl = el("puttSpinAxis");
+const puttTotalSpinEl = el("puttTotalSpin");
+const puttSendStatusEl = el("puttSendStatus");
 const puttRejectionEl = el("puttRejection");
+
+// Mirrors GsProCodec.BuildPutt's fabricated-value formula (protocol.py's
+// rolling_spin_rpm) -- shown so the provenance display reflects what was actually sent,
+// not a static placeholder.
+const rollingSpinRpm = (speedMph) => 200.0 * speedMph;
 
 function post(type, extra = {}) {
   window.chrome.webview.postMessage({ type, ...extra });
@@ -85,17 +94,26 @@ function applyStatus(status) {
 
   detectorErrorEl.textContent = status.DetectorError ? `Detection unavailable: ${status.DetectorError}` : "";
   if (status.LastPutt) {
-    puttSpeedEl.textContent = `${status.LastPutt.SpeedMph.toFixed(2)} mph`;
-    puttHlaEl.textContent = `${status.LastPutt.HlaDegrees.toFixed(2)}°`;
-    puttDistanceEl.textContent = `${status.LastPutt.DistanceFt.toFixed(2)} ft`;
-    puttTrackPointsEl.textContent = status.LastPutt.TrackPointCount;
+    const putt = status.LastPutt;
+    puttSpeedEl.textContent = `${putt.SpeedMph.toFixed(2)} mph`;
+    puttHlaEl.textContent = `${putt.HlaDegrees.toFixed(2)}°`;
+    puttDistanceEl.textContent = `${putt.DistanceFt.toFixed(2)} ft`;
+    puttTrackPointsEl.textContent = putt.TrackPointCount;
+    puttVlaEl.textContent = "0";
+    puttSpinAxisEl.textContent = "0";
+    puttTotalSpinEl.textContent = rollingSpinRpm(putt.SpeedMph).toFixed(0);
+    puttSendStatusEl.textContent = status.LastPuttSendError ? `failed: ${status.LastPuttSendError}` : "yes";
     puttRejectionEl.textContent = "";
   } else {
     puttSpeedEl.textContent = "—";
     puttHlaEl.textContent = "—";
     puttDistanceEl.textContent = "—";
     puttTrackPointsEl.textContent = "—";
-    puttRejectionEl.textContent = status.LastPuttRejectionReason ? `Rejected: ${status.LastPuttRejectionReason}` : "";
+    puttVlaEl.textContent = "—";
+    puttSpinAxisEl.textContent = "—";
+    puttTotalSpinEl.textContent = "—";
+    puttSendStatusEl.textContent = "—";
+    puttRejectionEl.textContent = status.LastPuttRejectionReason ? `Rejected (not sent): ${status.LastPuttRejectionReason}` : "";
   }
 
   // Kept as local state (zone) so an in-progress drag doesn't fight the backend's

@@ -50,6 +50,7 @@ public partial class MainWindow : Window
     private string? _detectorError;
     private PuttMeasurement? _lastPuttMeasurement;
     private string? _lastPuttRejectionReason;
+    private string? _lastPuttSendError;
 
     public MainWindow()
     {
@@ -162,6 +163,15 @@ public partial class MainWindow : Window
         // signal; whichever one it was is decided below.
         _captureSession?.EndStroke();
 
+        // A rejected putt is never submitted -- only the Measured branch below ever
+        // calls Send(). This isn't a separate check to remember; it falls straight out
+        // of PuttDetectionOutcome only ever being one case or the other (ADR-0007).
+        string? sendError = null;
+        if (outcome is PuttDetectionOutcome.Measured measuredForSend)
+        {
+            sendError = SubmitPuttToGsPro(measuredForSend.Measurement);
+        }
+
         Dispatcher.Invoke(() =>
         {
             switch (outcome)
@@ -169,14 +179,52 @@ public partial class MainWindow : Window
                 case PuttDetectionOutcome.Measured measured:
                     _lastPuttMeasurement = measured.Measurement;
                     _lastPuttRejectionReason = null;
+                    _lastPuttSendError = sendError;
                     break;
                 case PuttDetectionOutcome.Rejected rejected:
                     _lastPuttRejectionReason = rejected.Reason;
                     _lastPuttMeasurement = null;
+                    _lastPuttSendError = null;
                     break;
             }
             PostStatus();
         });
+    }
+
+    /// <summary>
+    /// Submits a real measured putt to GSPro -- ticket #7's own job. VLA/SpinAxis are
+    /// always fabricated zero per GSPRO_PUTTING.md's verified putt payload (exp 8);
+    /// TotalSpin/BackSpin come from GsProCodec's rolling-spin estimate, also fabricated,
+    /// never measured -- the UI's provenance display must not imply otherwise. Returns
+    /// null on success, or an error message if the shot couldn't be sent at all (GSPro's
+    /// own accept/reject response, if any, arrives separately via the existing
+    /// OnResponse-driven PostStatus call, the same path the manual test-shot button
+    /// already uses).
+    /// </summary>
+    private string? SubmitPuttToGsPro(PuttMeasurement measurement)
+    {
+        // Called synchronously from the capture thread (ProcessDetectionFrame runs there,
+        // not on the UI thread) -- unlike SendTestShot's Task.Run wrapping, there's no UI
+        // freeze risk here. Send()'s pacing guard can delay this call by up to
+        // MinShotInterval, which only costs a slice of camera capture right after a putt
+        // has already finished, not UI responsiveness.
+        var connector = _connector;
+        var codec = _codec;
+        if (connector is null || codec is null || !connector.IsConnected)
+        {
+            return "Not connected to GSPro";
+        }
+
+        try
+        {
+            var payload = codec.BuildPutt(measurement.SpeedMph, measurement.HlaDegrees, vla: 0.0);
+            connector.Send(payload);
+            return null;
+        }
+        catch (Exception ex)
+        {
+            return ex.Message;
+        }
     }
 
     private void OnWebMessageReceived(object? sender, CoreWebView2WebMessageReceivedEventArgs e)
@@ -323,7 +371,8 @@ public partial class MainWindow : Window
             CalibrationError: _calibrationError,
             DetectorError: _detectorError,
             LastPutt: _lastPuttMeasurement,
-            LastPuttRejectionReason: _lastPuttRejectionReason);
+            LastPuttRejectionReason: _lastPuttRejectionReason,
+            LastPuttSendError: _lastPuttSendError);
         PostToUi("status", message);
     }
 
