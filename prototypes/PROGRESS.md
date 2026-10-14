@@ -5,6 +5,50 @@ Newest entries on top.
 
 ---
 
+## 2026-10-14 — P0-1: diagnosed and fixed the baseline detector's 0/37 score
+
+**What happened:** The finished 85-clip corpus's baseline.json (run 2026-09-17, never
+previously looked at) showed 0 true positives, 37 false negatives, and an *empty*
+rejections map -- meaning the detector's gate-crossing logic never even ran, not just
+that it scored shots wrong. Traced it on `clip_0026` (a labelled valid_putt) frame by
+frame: `_largest_ball_contour` was locking onto a static background glare/reflection
+(area 40957px, minEnclosingCircle radius 242px, circularity 0.04) instead of the real
+ball (area ~575px, radius ~14px, circularity 0.89) on every single frame, because it
+picked the largest contour by raw area with no shape check.
+
+**Root cause, checked against the actual reference implementation:** the original
+`ball_tracking.py` (`../../example-apps/cam-putting-py/`, lines 850/890-925) only gets
+away with "largest contour wins" because it first crops the mask to a hand-calibrated
+ROI box (`mask[y1:y2, sx1:640]`, set via config.ini's X/Y gate trackbars). That ROI crop
+was dropped when `cam_putting_baseline.py` was first ported, filed under "GUI/config
+machinery" -- it wasn't; it's load-bearing background rejection. This corpus has no
+per-clip ROI by design (harness spec), so on an uncontrolled-exposure full frame the
+largest bright blob is reliably background glare, not the ball.
+
+**Fix:** `_largest_ball_contour` now picks the most *circular* plausible-radius contour
+(new `max_radius_px`/`min_circularity` params) instead of the largest-by-area one --
+documented in the module docstring as a second explicit adaptation, same pattern as the
+existing grayscale-threshold note. Added a regression test
+(`test_ignores_a_larger_non_circular_glare_region_and_tracks_the_real_ball`) reproducing
+the glare-vs-ball shape directly. 9/9 unit tests pass.
+
+**Result on the full corpus:** 0 TP / 37 FN / 0 FP -> **4 TP / 19 FN / 10 FP / 18
+double-fires**. Ball tracking fundamentally works now; what's left (double-fire
+suppression, speed-calc accuracy, the false-positive rate) is real algorithm tuning,
+intentionally deferred -- this fix's job was only to prove the corpus and replay harness
+are functional, which is Phase 0's actual exit criterion for P0-1 and wasn't true before
+today. Not yet investigated: whether the 18 double-fires and large speed errors share one
+cause (e.g. `entry_dx_px`/re-arm timing) or are several independent issues.
+
+**Also noticed, not yet acted on:** `clip_0001`'s metadata (and presumably the rest of
+the corpus) shows `exposure_locked: false` -- the whole 85-clip corpus was captured with
+auto-exposure, which is P0-5's independent variable and a likely contributor to the
+double-fires/speed-error numbers above (ball brightness/size will vary frame to frame
+under auto-exposure in a way a locked exposure wouldn't). Worth an exposure-locked
+recapture before trusting any further tuning of this detector's numbers.
+
+---
+
 ## 2026-09-16 — P0-2: all 20 experiments complete, rollup docs written
 
 **What happened:** Finished the remaining experiments (08-20) against live GSPro in one

@@ -1,24 +1,55 @@
 {
   "clip_count": 85,
-  "true_positives": 0,
-  "false_negatives": 37,
-  "false_positives": 0,
-  "double_fires": 0,
+  "true_positives": 4,
+  "false_negatives": 19,
+  "false_positives": 10,
+  "double_fires": 18,
   "speed_error_pct": {
-    "mean": 0.0,
-    "median": 0.0,
-    "p95": 0.0
+    "mean": 63.87328902585393,
+    "median": 84.30121406198872,
+    "p95": 87.5620210656326
   },
   "hla_error_deg": {
-    "mean": 0.0,
-    "median": 0.0,
-    "p95": 0.0
+    "mean": 1.174926370839954,
+    "median": 1.2054375032979574,
+    "p95": 1.9603030571269588
   },
   "track_points": {
-    "min": 0,
-    "max": 0,
-    "mean": 0.0,
-    "counts": {}
+    "min": 2,
+    "max": 162,
+    "mean": 41.05263157894737,
+    "counts": {
+      "2": 3,
+      "3": 1,
+      "4": 1,
+      "5": 9,
+      "6": 7,
+      "7": 12,
+      "8": 2,
+      "9": 1,
+      "10": 2,
+      "12": 1,
+      "22": 1,
+      "39": 1,
+      "78": 1,
+      "87": 1,
+      "101": 1,
+      "104": 1,
+      "109": 2,
+      "118": 1,
+      "124": 1,
+      "142": 1,
+      "145": 1,
+      "148": 1,
+      "151": 1,
+      "152": 1,
+      "153": 1,
+      "155": 1,
+      "162": 1
+    }
   },
-  "rejections": {}
+  "rejections": {
+    "hla_out_of_range": 1,
+    "speed_out_of_range": 9
+  }
 }

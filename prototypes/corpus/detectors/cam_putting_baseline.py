@@ -15,6 +15,20 @@ original's "white ball" HSV range (bright, low-saturation) is really a brightnes
 threshold in disguise, so this port uses cv2.inRange on the grayscale value directly --
 functionally the same selectivity for a white ball, the only case a grayscale corpus can
 support. This is a documented substitution, not a silent one.
+
+A second, load-bearing adaptation found while diagnosing a 0/37-true-positives run against
+the finished corpus: the original's "largest contour wins" only works because it runs
+inside a hand-calibrated ROI crop (`mask[y1:y2, sx1:640]`, ball_tracking.py line 850, set
+via config.ini's X/Y gate trackbars) -- not GUI machinery, load-bearing filtering. This
+corpus has no per-clip ROI (the harness spec deliberately has no config.ini-defined
+zone), so on a full, uncontrolled-exposure frame the largest bright contour is reliably a
+static background glare/reflection, not the ball (confirmed on clip_0026: the glare
+contour has area 40957px / circularity 0.04 and never moves; the real ball has area ~575px
+/ circularity 0.89 and tracks cleanly frame-to-frame, matching that clip's hand-labelled
+gate_frames). Picking the most *circular* plausible-radius contour, instead of the
+largest-by-area one, is this port's equivalent of the original's ROI filtering for a
+corpus with no per-clip calibration. Documented here for the same reason as the
+grayscale substitution above: an adaptation, not a silent behavior change.
 """
 
 from __future__ import annotations
@@ -63,6 +77,8 @@ class CamPuttingBaselineDetector:
         gate1_frac: float = 0.3,
         gate2_frac: float = 0.7,
         min_radius_px: float = 5.0,
+        max_radius_px: float = 40.0,
+        min_circularity: float = 0.6,
         entry_dx_px: float = 50.0,
         hla_limit_deg: float = 40.0,
         speed_min_mph: float = 0.5,
@@ -73,6 +89,8 @@ class CamPuttingBaselineDetector:
         self.gate1_frac = gate1_frac
         self.gate2_frac = gate2_frac
         self.min_radius_px = min_radius_px
+        self.max_radius_px = max_radius_px
+        self.min_circularity = min_circularity
         self.entry_dx_px = entry_dx_px
         self.hla_limit_deg = hla_limit_deg
         self.speed_min_mph = speed_min_mph
@@ -91,14 +109,25 @@ class CamPuttingBaselineDetector:
         self.rejections: list[str] = []
 
     def _largest_ball_contour(self, mask: np.ndarray) -> tuple[float, float, float] | None:
+        """Most *circular* plausible-radius contour, not simply the largest by area --
+        see the module docstring's second adaptation note for why "largest" alone
+        reliably grabs background glare on this corpus's uncropped, uncontrolled-
+        exposure frames."""
         contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        if not contours:
-            return None
-        largest = max(contours, key=cv2.contourArea)
-        (x, y), radius = cv2.minEnclosingCircle(largest)
-        if radius < self.min_radius_px:
-            return None
-        return (x, y, radius)
+        best: tuple[float, float, float] | None = None
+        best_circularity = self.min_circularity
+        for contour in contours:
+            area = cv2.contourArea(contour)
+            if area <= 0:
+                continue
+            (x, y), radius = cv2.minEnclosingCircle(contour)
+            if radius < self.min_radius_px or radius > self.max_radius_px:
+                continue
+            circularity = area / (math.pi * radius * radius)
+            if circularity > best_circularity:
+                best_circularity = circularity
+                best = (x, y, radius)
+        return best
 
     def push_frame(self, t: float, frame: np.ndarray) -> PuttMeasurement | None:
         if self._gate1_x is None:

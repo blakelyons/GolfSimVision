@@ -12,6 +12,18 @@ def frame_with_ball(x: int, y: int, radius: int = 8, size=(120, 200)) -> np.ndar
     return frame
 
 
+def frame_with_ball_and_glare(x: int, y: int, radius: int = 8, size=(120, 200)) -> np.ndarray:
+    """A moving ball plus a static, non-circular bright strip -- reproduces the real
+    corpus bug (see module docstring's second adaptation note): a background
+    glare/reflection with a bigger area than the ball but a much lower circularity.
+    Sized (enclosing radius ~31px, within max_radius_px) so this isolates the
+    circularity check rather than just tripping the radius cap."""
+    frame = np.zeros(size, dtype=np.uint8)
+    cv2.rectangle(frame, (70, 90), (130, 105), 255, -1)  # flat glare strip, area 900
+    cv2.circle(frame, (x, y), radius, 255, -1)
+    return frame
+
+
 def feed_moving_ball(detector, y=60, x_start=10, x_end=190, step=4, radius=8, size=(120, 200), fps=120.0):
     """Push a series of frames where a bright ball moves left-to-right at constant y."""
     results = []
@@ -50,6 +62,24 @@ class TestCamPuttingBaselineDetector(unittest.TestCase):
         self.assertEqual(len(results), 1)
         self.assertGreater(results[0].speed_mph, 0)
         self.assertAlmostEqual(results[0].hla_deg, 0.0, delta=1.0)
+
+    def test_ignores_a_larger_non_circular_glare_region_and_tracks_the_real_ball(self):
+        """Regression test for the corpus bug this detector shipped with: picking the
+        largest-by-area contour locked onto a static background glare strip and never
+        fired on any of the 85 corpus clips. The glare strip here has ~3.4x the ball's
+        area; a correct detector must still lock onto and track the ball."""
+        detector = CamPuttingBaselineDetector()
+
+        results = []
+        t = 0.0
+        for x in range(10, 191, 4):
+            result = detector.push_frame(t, frame_with_ball_and_glare(x, 60))
+            if result is not None:
+                results.append(result)
+            t += 1.0 / 120.0
+
+        self.assertEqual(len(results), 1)
+        self.assertGreater(results[0].speed_mph, 0)
 
     def test_no_ball_in_frame_never_fires(self):
         detector = CamPuttingBaselineDetector()
