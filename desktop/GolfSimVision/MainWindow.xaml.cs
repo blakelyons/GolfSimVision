@@ -85,6 +85,10 @@ public partial class MainWindow : Window
         // not a second connection to GSPro.
         _r10Server.OnStatus = _ => Dispatcher.Invoke(() => PostStatus());
         _r10Server.OnShotReceived = ballData => RelayR10ShotToGsPro(ballData);
+        // Raw inbound logging: the R10's real BallData field names are an unverified
+        // assumption (see E6ConnectServer's own doc comment) -- this is how we find out
+        // what the real device actually sends instead of guessing.
+        _r10Server.OnReceive = frame => Console.WriteLine($"[r10] raw: {System.Text.Encoding.UTF8.GetString(frame)}");
         _r10Server.Start();
 
         await OpenCameraAsync();

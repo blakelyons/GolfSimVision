@@ -130,19 +130,47 @@ public sealed class UsbWebcam : IFrameSource
             var timestamp = DateTime.UtcNow.Ticks / (double)TimeSpan.TicksPerSecond;
             if (!ok || mat.Empty()) continue;
 
-            // Everything from here on (OnFrame -- which on the real app chains into ball
-            // detection, ONNX inference, and even a GSPro send) runs on this background
-            // thread with no other safety net. An unhandled exception on any thread, not
-            // just the UI thread, terminates the whole .NET process immediately -- a
-            // single bad frame must never be able to take the app down.
+            // OnFrame (ring buffer + detection + ONNX inference + a possible GSPro send)
+            // is isolated in its own try/catch, separate from health reporting and the
+            // preview send below -- a repeated failure in OnFrame (e.g. every real frame
+            // hitting the same detection bug) must never be able to starve the live
+            // preview just because it happens to run afterward in the same loop. Each of
+            // these three is an independent concern; one failing silently must not take
+            // the others down with it. All of it still runs on this background thread
+            // with no other safety net -- an unhandled exception on any thread, not just
+            // the UI thread, terminates the whole .NET process immediately.
+            byte[] bytes;
             try
             {
-                var bytes = MatToBgrBytes(mat);
-                OnFrame?.Invoke(new CapturedFrame(timestamp, mat.Width, mat.Height, bytes));
+                bytes = MatToBgrBytes(mat);
+            }
+            catch (Exception ex)
+            {
+                OnLog?.Invoke($"frame conversion failed, skipping this frame: {ex}");
+                continue;
+            }
 
+            try
+            {
+                OnFrame?.Invoke(new CapturedFrame(timestamp, mat.Width, mat.Height, bytes));
+            }
+            catch (Exception ex)
+            {
+                OnLog?.Invoke($"OnFrame handler failed (ring buffer/detection), continuing: {ex}");
+            }
+
+            try
+            {
                 var health = rateMonitor.RecordFrame(timestamp);
                 if (health is not null) MaybeReportHealth(health, timestamp);
+            }
+            catch (Exception ex)
+            {
+                OnLog?.Invoke($"health reporting failed, continuing: {ex}");
+            }
 
+            try
+            {
                 if (OnPreviewFrame is not null && timestamp - _lastPreviewAt >= PreviewIntervalMs / 1000.0)
                 {
                     _lastPreviewAt = timestamp;
@@ -152,7 +180,7 @@ public sealed class UsbWebcam : IFrameSource
             }
             catch (Exception ex)
             {
-                OnLog?.Invoke($"frame processing failed, skipping this frame: {ex}");
+                OnLog?.Invoke($"preview encode/send failed, continuing: {ex}");
             }
         }
     }
