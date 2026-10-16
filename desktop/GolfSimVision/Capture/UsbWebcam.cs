@@ -130,17 +130,29 @@ public sealed class UsbWebcam : IFrameSource
             var timestamp = DateTime.UtcNow.Ticks / (double)TimeSpan.TicksPerSecond;
             if (!ok || mat.Empty()) continue;
 
-            var bytes = MatToBgrBytes(mat);
-            OnFrame?.Invoke(new CapturedFrame(timestamp, mat.Width, mat.Height, bytes));
-
-            var health = rateMonitor.RecordFrame(timestamp);
-            if (health is not null) MaybeReportHealth(health, timestamp);
-
-            if (OnPreviewFrame is not null && timestamp - _lastPreviewAt >= PreviewIntervalMs / 1000.0)
+            // Everything from here on (OnFrame -- which on the real app chains into ball
+            // detection, ONNX inference, and even a GSPro send) runs on this background
+            // thread with no other safety net. An unhandled exception on any thread, not
+            // just the UI thread, terminates the whole .NET process immediately -- a
+            // single bad frame must never be able to take the app down.
+            try
             {
-                _lastPreviewAt = timestamp;
-                Cv2.ImEncode(".jpg", mat, out var jpegBytes, new ImageEncodingParam(ImwriteFlags.JpegQuality, 70));
-                OnPreviewFrame(jpegBytes);
+                var bytes = MatToBgrBytes(mat);
+                OnFrame?.Invoke(new CapturedFrame(timestamp, mat.Width, mat.Height, bytes));
+
+                var health = rateMonitor.RecordFrame(timestamp);
+                if (health is not null) MaybeReportHealth(health, timestamp);
+
+                if (OnPreviewFrame is not null && timestamp - _lastPreviewAt >= PreviewIntervalMs / 1000.0)
+                {
+                    _lastPreviewAt = timestamp;
+                    Cv2.ImEncode(".jpg", mat, out var jpegBytes, new ImageEncodingParam(ImwriteFlags.JpegQuality, 70));
+                    OnPreviewFrame(jpegBytes);
+                }
+            }
+            catch (Exception ex)
+            {
+                OnLog?.Invoke($"frame processing failed, skipping this frame: {ex}");
             }
         }
     }
