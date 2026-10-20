@@ -196,6 +196,12 @@ public sealed class UsbWebcam : IFrameSource
 
         _lastHealthEmitAt = timestamp;
         _lastReportedDegraded = health.IsDegraded;
+        // Doubles as a liveness heartbeat: this only fires if the capture loop actually
+        // reached this point in its current iteration. If OnFrame (detection) hangs rather
+        // than throws, this line simply stops appearing -- a try/catch can't catch a hang,
+        // so this is the only way to tell "loop stuck in detection" apart from "loop fine,
+        // something downstream (preview render) is the problem".
+        OnLog?.Invoke($"health: fps={health.MeasuredFps:F1} degraded={health.IsDegraded}{(health.DegradedReason is { } r ? $" ({r})" : "")}");
         OnHealth?.Invoke(health);
     }
 

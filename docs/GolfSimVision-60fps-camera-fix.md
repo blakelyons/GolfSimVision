@@ -106,3 +106,15 @@ Logging these every 5 seconds made the problem obvious: before, camera 60/s but 
 Tracking coordinates (`startx1`, `startx2`, `y1`, `y2`, `radius`) are in the **640x360** tracking frame, not in camera pixels.
 
 Reference implementation: `ball_tracking.py` in `D:\GSPro Putting\cam-putting-py-main` (see the `FfmpegCapture` class and the capture block that follows the camera-control section). A copy of the working state is in `working-backup-2026-10-14`.
+
+## 9. Real-world update (2026-10-20)
+
+Day-to-day use of the legacy app with this fix (run via the command below) does **not** hold a locked 60 fps the way the bench test in section 1 suggested -- it buffers between roughly 40-60 fps depending on what else the machine is doing. Still clearly better than the ~30 fps OpenCV-only ceiling, but "60 fps confirmed" in section 1 was a best-case bench number, not a guaranteed floor. Treat the 40-60 fps range as the honest expectation on real hardware under real load, and budget per-frame work accordingly (see section 1, item 4: per-frame work competes directly with the fps budget).
+
+Confirmed working run command for the legacy app (for reference/comparison only -- not part of GolfSimVision):
+
+```powershell
+cd "D:\GSPro Putting\cam-putting-py-main\dist\ball_tracking"; & "D:\GSPro Putting\cam-putting-py-main\venv\Scripts\python.exe" "D:\GSPro Putting\cam-putting-py-main\ball_tracking.py"
+```
+
+GolfSimVision's own capture path (`UsbWebcam.cs`, ADR-0004) still goes through OpenCvSharp's `CAP_MSMF` directly, not ffmpeg/MJPEG -- the ffmpeg approach above was never ported over. If real-camera testing in GolfSimVision itself turns up a similar sub-60fps ceiling, this is the proven fallback to adopt (checklist in section 7 still applies).

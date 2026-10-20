@@ -154,7 +154,21 @@ public partial class MainWindow : Window
             return;
         }
 
-        _detector = new BallDetector(modelPath);
+        try
+        {
+            _detector = new BallDetector(modelPath);
+        }
+        catch (Exception ex)
+        {
+            // Same graceful-degradation pattern as the missing-model case above: an ONNX
+            // session that fails to load (bad export, incompatible opset, ...) must not
+            // take the whole app down -- the rest of the app (GSPro relay, R10 ingress)
+            // still works without ball detection.
+            _detectorError = $"detector failed to initialize: {ex.Message}";
+            Console.WriteLine($"[detect] detector init failed: {ex}");
+            return;
+        }
+
         _zoneStateMachine = new ZoneStateMachine(_settings.Zone, frameWidth, frameHeight);
         _zoneStateMachine.OnStateChanged = state =>
         {
@@ -164,6 +178,7 @@ public partial class MainWindow : Window
         };
         _puttDetectionPipeline = new PuttDetectionPipeline(_detector, _zoneStateMachine, _calibrationService);
         _detectorError = null;
+        Console.WriteLine($"[detect] ready, frame={frameWidth}x{frameHeight}");
     }
 
     private void ProcessDetectionFrame(CapturedFrame frame)
